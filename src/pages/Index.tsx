@@ -20,6 +20,7 @@ interface Slide {
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState<string>('');
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
@@ -56,7 +57,8 @@ const Index = () => {
   ]);
 
   const handleExportPDF = async () => {
-    toast.loading('Генерация PDF...');
+    const loadingToast = toast.loading('Генерация PDF...');
+    const html2canvas = (await import('html2canvas')).default;
     
     try {
       const pdf = new jsPDF({
@@ -65,64 +67,42 @@ const Index = () => {
         format: 'a4'
       });
 
+      const wasEditing = isEditing;
+      if (wasEditing) setIsEditing(false);
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       for (let i = 0; i < slides.length; i++) {
-        const slide = slides[i];
+        if (i > 0) pdf.addPage();
         
-        if (i > 0) {
-          pdf.addPage();
+        const tempSlide = currentSlide;
+        setCurrentSlide(i);
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        const slideElement = document.getElementById(`slide-preview-${i}`);
+        if (slideElement) {
+          const canvas = await html2canvas(slideElement, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
         }
-
-        pdf.setFillColor(255, 255, 255);
-        pdf.rect(0, 0, 297, 210, 'F');
-
-        if (slide.image && slide.image.startsWith('http')) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise((resolve, reject) => {
-              img.onload = resolve;
-              img.onerror = reject;
-              img.src = slide.image;
-            });
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(img, 0, 0);
-              const imgData = canvas.toDataURL('image/jpeg', 0.8);
-              pdf.addImage(imgData, 'JPEG', 150, 20, 130, 85, '', 'FAST');
-            }
-          } catch (e) {
-            console.log('Failed to load image:', slide.image);
-          }
-        }
-
-        pdf.setFontSize(10);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text(slide.subtitle.toUpperCase(), 20, 25);
-
-        pdf.setFontSize(32);
-        pdf.setTextColor(100, 179, 98);
-        pdf.text(slide.title, 20, 40, { maxWidth: 120 });
-
-        pdf.setFontSize(14);
-        pdf.setTextColor(0, 0, 0);
-        const lines = pdf.splitTextToSize(slide.content, 120);
-        pdf.text(lines, 20, 60);
-
-        pdf.setFontSize(8);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text('усадьбаэрьзи.рф', 20, 200);
-        pdf.text(`${i + 1} / ${slides.length}`, 270, 200);
+        
+        setCurrentSlide(tempSlide);
       }
 
+      if (wasEditing) setIsEditing(true);
+      
       pdf.save('presentation-usadba-erzi.pdf');
-      toast.success('PDF успешно экспортирован!');
+      toast.success('PDF успешно экспортирован!', { id: loadingToast });
     } catch (error) {
       console.error('Export error:', error);
-      toast.error('Ошибка при экспорте PDF');
+      toast.error('Ошибка при экспорте PDF', { id: loadingToast });
     }
   };
 
@@ -135,9 +115,31 @@ const Index = () => {
     setSlides(updatedSlides);
   };
 
+  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBackgroundImage(reader.result as string);
+        toast.success('Фоновое изображение установлено');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+    <div className="min-h-screen bg-background relative">
+      {backgroundImage && (
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        />
+      )}
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 relative z-10">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
@@ -147,7 +149,7 @@ const Index = () => {
               усадьбаэрьзи.рф
             </p>
           </div>
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
             <Button
               variant={isEditing ? 'default' : 'outline'}
               onClick={() => setIsEditing(!isEditing)}
@@ -162,12 +164,39 @@ const Index = () => {
               <span className="hidden sm:inline">Экспорт PDF</span>
               <span className="sm:hidden">PDF</span>
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById('background-upload')?.click()}
+              className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base"
+            >
+              <Icon name="Image" size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Фон</span>
+            </Button>
+            {backgroundImage && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setBackgroundImage('');
+                  toast.success('Фон удалён');
+                }}
+                className="flex items-center gap-2 text-sm sm:text-base"
+              >
+                <Icon name="X" size={16} className="sm:w-[18px] sm:h-[18px]" />
+              </Button>
+            )}
+            <input
+              id="background-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleBackgroundUpload}
+            />
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
-            <Card className="p-3 sm:p-4">
+            <Card className={`p-3 sm:p-4 ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`}>
               <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
                 Слайды
               </h3>
@@ -193,7 +222,9 @@ const Index = () => {
           <div className="lg:col-span-9">
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto pr-2 sm:pr-4">
+                <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar relative">
+                  <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none z-10"></div>
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
                   <SlideEditor
                     key={currentSlide}
@@ -207,7 +238,7 @@ const Index = () => {
                 </div>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className="overflow-hidden shadow-2xl">
+                  <Card className={`overflow-hidden shadow-2xl ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`}>
                     <SlidePreview
                       title={slides[currentSlide].title}
                       subtitle={slides[currentSlide].subtitle}
@@ -220,7 +251,7 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <Card className="overflow-hidden shadow-2xl">
+              <Card className={`overflow-hidden shadow-2xl ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
                 <SlidePreview
                   title={slides[currentSlide].title}
                   subtitle={slides[currentSlide].subtitle}

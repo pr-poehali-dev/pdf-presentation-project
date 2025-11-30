@@ -423,12 +423,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   return (
     <div className="space-y-4">
-      <div className="mb-6 p-4 border border-border rounded-lg">
+      <div className="mb-6 p-4 border border-border rounded-lg bg-card">
         <label className="text-sm font-medium mb-3 block text-foreground">Шаблон раскладки</label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <button
             onClick={() => handleLayoutChange('center')}
-            className={`p-3 border rounded-lg transition-all ${
+            className={`p-3 border rounded-lg transition-all bg-card ${
               currentLayout === 'center' 
                 ? 'border-primary bg-primary/10' 
                 : 'border-border hover:border-primary/50'
@@ -438,12 +438,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
               <div className="w-full h-8 bg-muted rounded flex items-center justify-center">
                 <div className="w-3/4 h-1 bg-foreground/30 rounded" />
               </div>
-              <span className="text-xs">Центр</span>
+              <span className="text-xs text-foreground">Центр</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('left')}
-            className={`p-3 border rounded-lg transition-all ${
+            className={`p-3 border rounded-lg transition-all bg-card ${
               currentLayout === 'left' 
                 ? 'border-primary bg-primary/10' 
                 : 'border-border hover:border-primary/50'
@@ -453,12 +453,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
               <div className="w-full h-8 bg-muted rounded flex items-start justify-start p-1">
                 <div className="w-1/2 h-full bg-foreground/30 rounded" />
               </div>
-              <span className="text-xs">Слева</span>
+              <span className="text-xs text-foreground">Слева</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('right')}
-            className={`p-3 border rounded-lg transition-all ${
+            className={`p-3 border rounded-lg transition-all bg-card ${
               currentLayout === 'right' 
                 ? 'border-primary bg-primary/10' 
                 : 'border-border hover:border-primary/50'
@@ -468,12 +468,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
               <div className="w-full h-8 bg-muted rounded flex items-end justify-end p-1">
                 <div className="w-1/2 h-full bg-foreground/30 rounded" />
               </div>
-              <span className="text-xs">Справа</span>
+              <span className="text-xs text-foreground">Справа</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('full')}
-            className={`p-3 border rounded-lg transition-all ${
+            className={`p-3 border rounded-lg transition-all bg-card ${
               currentLayout === 'full' 
                 ? 'border-primary bg-primary/10' 
                 : 'border-border hover:border-primary/50'
@@ -481,7 +481,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           >
             <div className="flex flex-col items-center gap-1">
               <div className="w-full h-8 bg-foreground/30 rounded" />
-              <span className="text-xs">Полный</span>
+              <span className="text-xs text-foreground">Полный</span>
             </div>
           </button>
         </div>
