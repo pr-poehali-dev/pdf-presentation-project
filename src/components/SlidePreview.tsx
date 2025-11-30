@@ -26,15 +26,6 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
             />
           </div>
         )}
-        <div className={`inline-block ${fullSize ? 'px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm mb-4 sm:mb-6' : 'px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs mb-3 sm:mb-4'} bg-secondary/30 rounded-full font-medium text-secondary-foreground`}>
-          {subtitle}
-        </div>
-        <h2 
-          className={`${fullSize ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-4 sm:mb-6 md:mb-8' : 'text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4'} font-bold text-primary leading-tight break-words`}
-          style={{ fontFamily: 'Montserrat, sans-serif' }}
-        >
-          {title}
-        </h2>
         <div 
           className={`${fullSize ? 'text-sm sm:text-base' : 'text-[11px] sm:text-xs'} text-foreground/80 leading-relaxed prose prose-sm max-w-none`}
           style={{ fontFamily: 'Open Sans, sans-serif' }}

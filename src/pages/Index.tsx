@@ -63,7 +63,7 @@ const Index = () => {
       id: 1,
       title: 'Эко-поселок на берегу Яхромы',
       subtitle: 'Усадьба скульптора Эрьзи',
-      content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
+      content: '<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">Усадьба скульптора Эрьзи</div><h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">Эко-поселок на берегу Яхромы</h2><div style="margin-bottom: 1rem;">Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.</div>',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
       layout: 'center',
       showLogo: true,
@@ -73,7 +73,7 @@ const Index = () => {
       id: 2,
       title: 'Стратегия продвижения',
       subtitle: 'Целевые площадки и каналы',
-      content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
+      content: '<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">Целевые площадки и каналы</div><h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">Стратегия продвижения</h2><div style="margin-bottom: 1rem;">• Яндекс.Карты — геолокация и навигация для гостей<br/>• Instagram — визуальный контент природы и активностей<br/>• ВКонтакте — комьюнити любителей экотуризма<br/>• Сайты бронирования — Booking, Ostrovok<br/>• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)</div>',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
       layout: 'left',
       showLogo: false,
@@ -83,7 +83,7 @@ const Index = () => {
       id: 3,
       title: 'Этапы реализации',
       subtitle: 'Пошаговый план действий',
-      content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
+      content: '<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">Пошаговый план действий</div><h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">Этапы реализации</h2><div style="margin-bottom: 1rem;">1. Аудит присутствия и конкурентов (неделя 1-2)<br/>2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)<br/>3. Оптимизация профилей и SEO (неделя 3-4)<br/>4. Запуск таргетированной рекламы (неделя 5)<br/>5. Развитие партнерской сети с курортами (постоянно)</div>',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
       layout: 'right',
       showLogo: false,
@@ -93,7 +93,7 @@ const Index = () => {
       id: 4,
       title: 'Ожидаемые результаты',
       subtitle: 'Измеримые показатели роста',
-      content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
+      content: '<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">Измеримые показатели роста</div><h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">Ожидаемые результаты</h2><div style="margin-bottom: 1rem;">• Рост узнаваемости бренда на 200%<br/>• Увеличение прямых бронирований на 120%<br/>• Повышение среднего чека на 35%<br/>• Загрузка объектов круглый год 75%+<br/>• Развитие партнерской сети с 5+ курортами</div>',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
       layout: 'left',
       showLogo: false,
@@ -263,38 +263,13 @@ const Index = () => {
         contentDiv.style.gap = '60px';
         contentDiv.style.background = 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)';
         
-        const primaryColor = settings.mainTitleColor || 'hsl(119, 42%, 53%)';
-        const rgbPrimary = primaryColor.startsWith('hsl') ? 'rgb(89, 181, 96)' : primaryColor;
-        
+
         const textContainer = document.createElement('div');
         textContainer.style.flex = slide.layout === 'left' || slide.layout === 'right' ? '1.2' : '1';
         textContainer.style.display = 'flex';
         textContainer.style.flexDirection = 'column';
         textContainer.style.justifyContent = 'center';
         textContainer.style.maxWidth = slide.layout === 'center' ? '900px' : 'none';
-        
-        const subtitleEl = document.createElement('div');
-        subtitleEl.textContent = slide.subtitle;
-        subtitleEl.style.display = 'inline-block';
-        subtitleEl.style.padding = '14px 32px';
-        subtitleEl.style.background = 'rgba(128, 128, 128, 0.25)';
-        subtitleEl.style.color = '#333333';
-        subtitleEl.style.borderRadius = '999px';
-        subtitleEl.style.fontSize = '28px';
-        subtitleEl.style.fontWeight = '400';
-        subtitleEl.style.marginBottom = '32px';
-        subtitleEl.style.fontFamily = 'Open Sans, sans-serif';
-        subtitleEl.style.alignSelf = 'flex-start';
-        
-        const titleEl = document.createElement('h2');
-        titleEl.textContent = slide.title;
-        titleEl.style.fontSize = '96px';
-        titleEl.style.fontWeight = '700';
-        titleEl.style.color = rgbPrimary;
-        titleEl.style.marginBottom = '40px';
-        titleEl.style.lineHeight = '1.15';
-        titleEl.style.fontFamily = 'Montserrat, sans-serif';
-        titleEl.style.letterSpacing = '-0.02em';
         
         const contentEl = document.createElement('div');
         contentEl.innerHTML = slide.content;
@@ -305,8 +280,6 @@ const Index = () => {
         contentEl.style.fontWeight = '400';
         contentEl.style.maxWidth = '100%';
         
-        textContainer.appendChild(subtitleEl);
-        textContainer.appendChild(titleEl);
         textContainer.appendChild(contentEl);
         
         if (slide.layout === 'center') {

@@ -207,12 +207,22 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     const titleBlocks = updatedBlocks.filter(b => b.type === 'title');
     const subtitleBlocks = updatedBlocks.filter(b => b.type === 'subtitle');
     const imageBlocks = updatedBlocks.filter(b => b.type === 'image');
-    const textBlocks = updatedBlocks.filter(b => b.type === 'text');
+    
+    const contentParts: string[] = [];
+    updatedBlocks.forEach(block => {
+      if (block.type === 'title') {
+        contentParts.push(`<h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">${block.content}</h2>`);
+      } else if (block.type === 'subtitle') {
+        contentParts.push(`<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">${block.content}</div>`);
+      } else if (block.type === 'text') {
+        contentParts.push(`<div style="margin-bottom: 1rem;">${block.content}</div>`);
+      }
+    });
 
     onUpdate({
-      title: titleBlocks.map(b => b.content).join(' • '),
-      subtitle: subtitleBlocks.map(b => b.content).join(' • '),
-      content: textBlocks.map(b => b.content).join('\n\n'),
+      title: titleBlocks.length > 0 ? titleBlocks[0].content : 'Заголовок',
+      subtitle: subtitleBlocks.length > 0 ? subtitleBlocks[0].content : 'Подзаголовок',
+      content: contentParts.join(''),
       image: imageBlocks.find(b => b.content)?.content || '',
       layout: newLayout || currentLayout
     });
