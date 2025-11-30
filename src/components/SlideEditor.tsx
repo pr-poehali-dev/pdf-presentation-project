@@ -27,6 +27,7 @@ interface Block {
   id: string;
   type: 'text' | 'image' | 'title' | 'subtitle';
   content: string;
+  originalImage?: string;
 }
 
 interface SlideEditorProps {
@@ -57,33 +58,6 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [targetBlockId, setTargetBlockId] = useState<string | null>(null);
-  const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!focusedBlockId) return;
-      
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-      const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
-      
-      if (ctrlKey && e.shiftKey && e.key === 'ArrowUp') {
-        e.preventDefault();
-        moveBlock(focusedBlockId, 'up');
-      } else if (ctrlKey && e.shiftKey && e.key === 'ArrowDown') {
-        e.preventDefault();
-        moveBlock(focusedBlockId, 'down');
-      } else if (ctrlKey && e.key === 'd') {
-        e.preventDefault();
-        duplicateBlock(focusedBlockId);
-      } else if (ctrlKey && e.key === 'Backspace') {
-        e.preventDefault();
-        deleteBlock(focusedBlockId);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [focusedBlockId, blocks]);
 
   const updateBlock = (id: string, content: string) => {
     const updatedBlocks = blocks.map(block =>
@@ -164,16 +138,57 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     toast.success('Блок скопирован');
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && targetBlockId) {
+  const compressImage = (file: File, maxWidth = 800, maxHeight = 800, quality = 0.85): Promise<{ compressed: string; original: string }> => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        updateBlock(targetBlockId, reader.result as string);
-        toast.success('Изображение загружено');
-        setTargetBlockId(null);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+            resolve({ compressed, original: e.target?.result as string });
+          }
+        };
+        img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && targetBlockId) {
+      const { compressed, original } = await compressImage(file);
+      
+      const updatedBlocks = blocks.map(block =>
+        block.id === targetBlockId 
+          ? { ...block, content: compressed, originalImage: original } 
+          : block
+      );
+      setBlocks(updatedBlocks);
+      notifyParent(updatedBlocks);
+      toast.success('Изображение загружено');
+      setTargetBlockId(null);
     }
   };
 
@@ -237,18 +252,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
       <div 
         ref={setNodeRef}
         style={style}
-        className={`group relative border rounded-lg p-4 mb-4 transition-colors bg-card ${
-          focusedBlockId === block.id 
-            ? 'border-primary ring-2 ring-primary/20' 
-            : 'border-border hover:border-primary'
-        }`}
-        onFocus={() => setFocusedBlockId(block.id)}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-            setFocusedBlockId(null);
-          }
-        }}
-        tabIndex={0}
+        className="group relative border border-border rounded-lg p-4 mb-4 transition-colors bg-card hover:border-primary"
       >
         <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
           <Button
@@ -303,11 +307,11 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
         {block.type === 'title' && (
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Заголовок</label>
+            <label className="text-xs font-medium text-foreground/70 mb-1 block">Заголовок</label>
             <Input
               value={block.content}
               onChange={(e) => updateBlock(block.id, e.target.value)}
-              className="text-2xl font-bold h-auto py-2"
+              className="text-xl sm:text-2xl font-bold h-auto py-2 bg-background text-foreground"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             />
           </div>
@@ -315,18 +319,18 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
         {block.type === 'subtitle' && (
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Подзаголовок</label>
+            <label className="text-xs font-medium text-foreground/70 mb-1 block">Подзаголовок</label>
             <Input
               value={block.content}
               onChange={(e) => updateBlock(block.id, e.target.value)}
-              className="h-auto py-2"
+              className="h-auto py-2 bg-background text-foreground"
             />
           </div>
         )}
 
         {block.type === 'text' && (
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Текстовый блок</label>
+            <label className="text-xs font-medium text-foreground/70 mb-1 block">Текстовый блок</label>
             <ReactQuill
               theme="snow"
               value={block.content}
@@ -344,7 +348,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
         {block.type === 'image' && (
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-2 block">Изображение</label>
+            <label className="text-xs font-medium text-foreground/70 mb-2 block">Изображение</label>
             {block.content ? (
               <div className="relative">
                 <img src={block.content} alt="Preview" className="w-full h-48 object-cover rounded" />
@@ -419,19 +423,9 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   return (
     <div className="space-y-4">
-      <div className="mb-6 p-4 border border-border rounded-lg bg-muted/30">
-        <label className="text-sm font-medium mb-3 block">Горячие клавиши</label>
-        <div className="text-xs text-muted-foreground space-y-1 mb-4">
-          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Shift + ↑</kbd> — Переместить вверх</div>
-          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Shift + ↓</kbd> — Переместить вниз</div>
-          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + D</kbd> — Копировать блок</div>
-          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Backspace</kbd> — Удалить блок</div>
-        </div>
-      </div>
-      
       <div className="mb-6 p-4 border border-border rounded-lg">
-        <label className="text-sm font-medium mb-3 block">Шаблон раскладки</label>
-        <div className="grid grid-cols-4 gap-2">
+        <label className="text-sm font-medium mb-3 block text-foreground">Шаблон раскладки</label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <button
             onClick={() => handleLayoutChange('center')}
             className={`p-3 border rounded-lg transition-all ${

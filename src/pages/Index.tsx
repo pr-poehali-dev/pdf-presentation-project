@@ -137,35 +137,37 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <header className="flex justify-between items-center mb-8">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-primary mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
               Презентация продвижения
             </h1>
-            <p className="text-muted-foreground" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-sm sm:text-base text-muted-foreground" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               усадьбаэрьзи.рф
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             <Button
               variant={isEditing ? 'default' : 'outline'}
               onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base"
             >
-              <Icon name={isEditing ? 'Check' : 'Pencil'} size={18} />
-              {isEditing ? 'Готово' : 'Редактировать'}
+              <Icon name={isEditing ? 'Check' : 'Pencil'} size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">{isEditing ? 'Готово' : 'Редактировать'}</span>
+              <span className="sm:hidden">{isEditing ? 'Готово' : 'Редакт.'}</span>
             </Button>
-            <Button onClick={handleExportPDF} className="flex items-center gap-2">
-              <Icon name="Download" size={18} />
-              Экспорт PDF
+            <Button onClick={handleExportPDF} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
+              <Icon name="Download" size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Экспорт PDF</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
-            <Card className="p-4">
+            <Card className="p-3 sm:p-4">
               <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
                 Слайды
               </h3>
@@ -190,9 +192,9 @@ const Index = () => {
 
           <div className="lg:col-span-9">
             {isEditing ? (
-              <div className="grid grid-cols-2 gap-6">
-                <div className="max-h-[700px] overflow-y-auto pr-4">
-                  <h3 className="text-lg font-semibold mb-4">Редактор</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto pr-2 sm:pr-4">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
                   <SlideEditor
                     key={currentSlide}
                     title={slides[currentSlide].title}
@@ -203,8 +205,8 @@ const Index = () => {
                     onUpdate={handleUpdateSlide}
                   />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Превью</h3>
+                <div className="hidden lg:block">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
                   <Card className="overflow-hidden shadow-2xl">
                     <SlidePreview
                       title={slides[currentSlide].title}
@@ -230,7 +232,7 @@ const Index = () => {
               </Card>
             )}
 
-            <div className="flex justify-between items-center mt-6">
+            <div className="flex justify-between items-center mt-4 sm:mt-6 gap-4">
               <Button
                 variant="outline"
                 onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}

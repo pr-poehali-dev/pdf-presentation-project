@@ -14,18 +14,18 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
   const [isImageOpen, setIsImageOpen] = useState(false);
   const renderContent = () => {
     const contentBlock = (
-      <div className={`${fullSize ? 'max-w-2xl' : 'max-w-md'} animate-fade-in`}>
-        <div className={`inline-block ${fullSize ? 'px-4 py-1.5' : 'px-3 py-1'} bg-secondary/20 rounded-full ${fullSize ? 'text-sm' : 'text-xs'} font-medium text-secondary ${fullSize ? 'mb-6' : 'mb-4'}`}>
+      <div className={`${fullSize ? 'max-w-2xl' : 'max-w-md'} animate-fade-in px-4 sm:px-0`}>
+        <div className={`inline-block ${fullSize ? 'px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm mb-4 sm:mb-6' : 'px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs mb-3 sm:mb-4'} bg-secondary/20 rounded-full font-medium text-secondary`}>
           {subtitle}
         </div>
         <h2 
-          className={`${fullSize ? 'text-5xl mb-8' : 'text-3xl mb-4'} font-bold text-primary leading-tight`}
+          className={`${fullSize ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-4 sm:mb-6 md:mb-8' : 'text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4'} font-bold text-primary leading-tight break-words`}
           style={{ fontFamily: 'Montserrat, sans-serif' }}
         >
           {title}
         </h2>
         <div 
-          className={`${fullSize ? 'text-base' : 'text-xs'} text-foreground/80 leading-relaxed`}
+          className={`${fullSize ? 'text-sm sm:text-base' : 'text-[11px] sm:text-xs'} text-foreground/80 leading-relaxed prose prose-sm max-w-none`}
           style={{ fontFamily: 'Open Sans, sans-serif' }}
           dangerouslySetInnerHTML={{ __html: content }}
         />
@@ -33,7 +33,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     );
 
     const imageBlock = image && (
-      <div className={`${layout === 'full' ? 'w-full h-64' : 'flex-1'} overflow-hidden rounded-lg`}>
+      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : 'flex-1 min-h-[150px] sm:min-h-[200px]'} overflow-hidden rounded-lg`}>
         <img 
           src={image} 
           alt={title}
@@ -57,7 +57,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
                 />
               </div>
             )}
-            <div className={`relative z-10 ${fullSize ? 'p-12' : 'p-8'} flex flex-col justify-center h-full`}>
+            <div className={`relative z-10 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'} flex flex-col justify-center h-full`}>
               {contentBlock}
             </div>
           </div>
@@ -65,8 +65,8 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'left':
         return (
-          <div className={`flex items-center gap-6 h-full ${fullSize ? 'p-12' : 'p-8'}`}>
-            <div className="flex-1">
+          <div className={`flex flex-col md:flex-row items-center gap-4 sm:gap-6 h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'}`}>
+            <div className="flex-1 w-full">
               {contentBlock}
             </div>
             {imageBlock}
@@ -75,9 +75,9 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'right':
         return (
-          <div className={`flex items-center gap-6 h-full ${fullSize ? 'p-12' : 'p-8'}`}>
+          <div className={`flex flex-col md:flex-row items-center gap-4 sm:gap-6 h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'}`}>
             {imageBlock}
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               {contentBlock}
             </div>
           </div>
@@ -85,7 +85,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className={`flex flex-col h-full ${fullSize ? 'p-12' : 'p-8'} gap-6`}>
+          <div className={`flex flex-col h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
             {imageBlock}
             {contentBlock}
           </div>
