@@ -48,11 +48,11 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
         return (
           <div className="relative h-full">
             {image && (
-              <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden opacity-20">
+              <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden opacity-15">
                 <img 
                   src={image} 
                   alt={title}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-30 transition-opacity"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-25 transition-opacity"
                   onClick={() => setIsImageOpen(true)}
                 />
               </div>
@@ -98,16 +98,16 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
   return (
     <>
-      <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
+      <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden">
         {renderContent()}
       </div>
       
       <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
-        <DialogContent className="max-w-6xl p-0 bg-transparent border-none" onClick={() => setIsImageOpen(false)}>
+        <DialogContent className="max-w-6xl p-0 bg-transparent border-none shadow-2xl" onClick={() => setIsImageOpen(false)}>
           <img 
             src={image} 
             alt={title}
-            className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+            className="w-full h-auto max-h-[90vh] object-contain rounded-3xl"
           />
         </DialogContent>
       </Dialog>

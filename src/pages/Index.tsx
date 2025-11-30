@@ -120,8 +120,14 @@ const Index = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setBackgroundImage(reader.result as string);
-        toast.success('Фоновое изображение установлено');
+        const result = reader.result as string;
+        
+        const img = new Image();
+        img.onload = () => {
+          setBackgroundImage(result);
+          toast.success('Фоновое изображение установлено');
+        };
+        img.src = result;
       };
       reader.readAsDataURL(file);
     }
@@ -196,23 +202,23 @@ const Index = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
-            <Card className={`p-3 sm:p-4 ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`}>
+            <Card className={`p-3 sm:p-4 shadow-lg ${backgroundImage ? 'bg-background/70 backdrop-blur-xl border-background/30' : ''}`}>
               <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
                 Слайды
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {slides.map((slide, index) => (
                   <button
                     key={slide.id}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-full text-left p-3 rounded-lg transition-all ${
+                    className={`w-full text-left p-3 rounded-xl transition-all ${
                       currentSlide === index
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'bg-muted hover:bg-muted/80'
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-[1.02]'
+                        : 'bg-muted hover:bg-muted/80 hover:scale-[1.01]'
                     }`}
                   >
                     <div className="text-xs font-semibold mb-1">Слайд {index + 1}</div>
-                    <div className="text-sm">{slide.title}</div>
+                    <div className="text-sm line-clamp-1">{slide.title}</div>
                   </button>
                 ))}
               </div>
@@ -222,9 +228,9 @@ const Index = () => {
           <div className="lg:col-span-9">
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar relative">
-                  <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none z-10"></div>
+                <Card className={`max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar relative p-4 shadow-lg ${backgroundImage ? 'bg-background/70 backdrop-blur-xl border-background/30' : ''}`}>
+                  <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-background/80 to-transparent pointer-events-none z-10 rounded-t-2xl"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background/80 to-transparent pointer-events-none z-10 rounded-b-2xl"></div>
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
                   <SlideEditor
                     key={currentSlide}
@@ -235,10 +241,10 @@ const Index = () => {
                     layout={slides[currentSlide].layout}
                     onUpdate={handleUpdateSlide}
                   />
-                </div>
+                </Card>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className={`overflow-hidden shadow-2xl ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`}>
+                  <Card className={`overflow-hidden shadow-xl ${backgroundImage ? 'bg-background/70 backdrop-blur-xl border-background/30' : ''}`}>
                     <SlidePreview
                       title={slides[currentSlide].title}
                       subtitle={slides[currentSlide].subtitle}
@@ -251,7 +257,7 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <Card className={`overflow-hidden shadow-2xl ${backgroundImage ? 'bg-background/80 backdrop-blur-md border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
+              <Card className={`overflow-hidden shadow-xl ${backgroundImage ? 'bg-background/70 backdrop-blur-xl border-background/30' : ''}`} id={`slide-preview-${currentSlide}`}>
                 <SlidePreview
                   title={slides[currentSlide].title}
                   subtitle={slides[currentSlide].subtitle}

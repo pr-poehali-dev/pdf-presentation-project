@@ -252,13 +252,13 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
       <div 
         ref={setNodeRef}
         style={style}
-        className="group relative border border-border rounded-lg p-4 mb-4 transition-colors bg-card hover:border-primary"
+        className="group relative border border-border rounded-2xl p-4 mb-4 transition-all bg-card hover:border-primary hover:shadow-lg"
       >
-        <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-all flex gap-1">
           <Button
             size="sm"
             variant="secondary"
-            className="h-7 w-7 p-0 cursor-grab active:cursor-grabbing"
+            className="h-8 w-8 p-0 cursor-grab active:cursor-grabbing rounded-full shadow-md hover:shadow-lg"
             title="Перетащить"
             {...attributes}
             {...listeners}
@@ -268,7 +268,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           <Button
             size="sm"
             variant="secondary"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0 rounded-full shadow-md hover:shadow-lg"
             onClick={() => moveBlock(block.id, 'up')}
             disabled={index === 0}
             title="Переместить вверх"
@@ -278,7 +278,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           <Button
             size="sm"
             variant="secondary"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0 rounded-full shadow-md hover:shadow-lg"
             onClick={() => moveBlock(block.id, 'down')}
             disabled={index === blocks.length - 1}
             title="Переместить вниз"
@@ -288,7 +288,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           <Button
             size="sm"
             variant="default"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0 rounded-full shadow-md hover:shadow-lg"
             onClick={() => duplicateBlock(block.id)}
             title="Копировать блок"
           >
@@ -297,7 +297,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           <Button
             size="sm"
             variant="destructive"
-            className="h-7 w-7 p-0"
+            className="h-8 w-8 p-0 rounded-full shadow-md hover:shadow-lg"
             onClick={() => deleteBlock(block.id)}
             title="Удалить блок"
           >
@@ -311,7 +311,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             <Input
               value={block.content}
               onChange={(e) => updateBlock(block.id, e.target.value)}
-              className="text-xl sm:text-2xl font-bold h-auto py-2 bg-background text-foreground"
+              className="text-xl sm:text-2xl font-bold h-auto py-3 bg-background text-foreground rounded-xl border-2 focus:border-primary transition-all"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             />
           </div>
@@ -323,7 +323,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             <Input
               value={block.content}
               onChange={(e) => updateBlock(block.id, e.target.value)}
-              className="h-auto py-2 bg-background text-foreground"
+              className="h-auto py-2 bg-background text-foreground rounded-xl border-2 focus:border-primary transition-all"
             />
           </div>
         )}
@@ -350,12 +350,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           <div>
             <label className="text-xs font-medium text-foreground/70 mb-2 block">Изображение</label>
             {block.content ? (
-              <div className="relative">
-                <img src={block.content} alt="Preview" className="w-full h-48 object-cover rounded" />
+              <div className="relative group/image">
+                <img src={block.content} alt="Preview" className="w-full h-48 object-cover rounded-2xl" />
                 <Button
                   size="sm"
                   variant="secondary"
-                  className="absolute top-2 right-2"
+                  className="absolute top-3 right-3 rounded-full shadow-lg opacity-0 group-hover/image:opacity-100 transition-all"
                   onClick={() => {
                     setTargetBlockId(block.id);
                     fileInputRef.current?.click();
@@ -367,7 +367,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             ) : (
               <Button
                 variant="outline"
-                className="w-full h-32"
+                className="w-full h-32 rounded-2xl border-2 border-dashed hover:border-primary transition-all"
                 onClick={() => {
                   setTargetBlockId(block.id);
                   fileInputRef.current?.click();
@@ -379,12 +379,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           </div>
         )}
 
-        <div className="flex gap-2 mt-3 pt-3 border-t border-border flex-wrap">
+        <div className="flex gap-2 mt-4 pt-4 border-t border-border/50 flex-wrap">
           <Button
             size="sm"
             variant="ghost"
             onClick={() => addBlock(block.id, 'title')}
-            className="text-xs"
+            className="text-xs rounded-xl hover:bg-primary/10"
           >
             <Icon name="Heading1" size={14} className="mr-1" />
             Заголовок
@@ -393,7 +393,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             size="sm"
             variant="ghost"
             onClick={() => addBlock(block.id, 'subtitle')}
-            className="text-xs"
+            className="text-xs rounded-xl hover:bg-primary/10"
           >
             <Icon name="Heading2" size={14} className="mr-1" />
             Подзаголовок
@@ -402,7 +402,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             size="sm"
             variant="ghost"
             onClick={() => addBlock(block.id, 'text')}
-            className="text-xs"
+            className="text-xs rounded-xl hover:bg-primary/10"
           >
             <Icon name="Type" size={14} className="mr-1" />
             Текст
@@ -411,7 +411,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             size="sm"
             variant="ghost"
             onClick={() => addBlock(block.id, 'image')}
-            className="text-xs"
+            className="text-xs rounded-xl hover:bg-primary/10"
           >
             <Icon name="ImagePlus" size={14} className="mr-1" />
             Фото
@@ -423,65 +423,65 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   return (
     <div className="space-y-4">
-      <div className="mb-6 p-4 border border-border rounded-lg bg-card">
-        <label className="text-sm font-medium mb-3 block text-foreground">Шаблон раскладки</label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="mb-6 p-5 border border-border rounded-2xl bg-card shadow-md">
+        <label className="text-sm font-medium mb-4 block text-foreground">Шаблон раскладки</label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <button
             onClick={() => handleLayoutChange('center')}
-            className={`p-3 border rounded-lg transition-all bg-card ${
+            className={`p-4 border-2 rounded-2xl transition-all hover:scale-105 ${
               currentLayout === 'center' 
-                ? 'border-primary bg-primary/10' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-primary bg-primary/10 shadow-lg' 
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
             }`}
           >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-full h-8 bg-muted rounded flex items-center justify-center">
-                <div className="w-3/4 h-1 bg-foreground/30 rounded" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-full h-8 bg-muted rounded-lg flex items-center justify-center">
+                <div className="w-3/4 h-1.5 bg-foreground/30 rounded-full" />
               </div>
-              <span className="text-xs text-foreground">Центр</span>
+              <span className="text-xs font-medium text-foreground">Центр</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('left')}
-            className={`p-3 border rounded-lg transition-all bg-card ${
+            className={`p-4 border-2 rounded-2xl transition-all hover:scale-105 ${
               currentLayout === 'left' 
-                ? 'border-primary bg-primary/10' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-primary bg-primary/10 shadow-lg' 
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
             }`}
           >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-full h-8 bg-muted rounded flex items-start justify-start p-1">
-                <div className="w-1/2 h-full bg-foreground/30 rounded" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-full h-8 bg-muted rounded-lg flex items-start justify-start p-1">
+                <div className="w-1/2 h-full bg-foreground/30 rounded-md" />
               </div>
-              <span className="text-xs text-foreground">Слева</span>
+              <span className="text-xs font-medium text-foreground">Слева</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('right')}
-            className={`p-3 border rounded-lg transition-all bg-card ${
+            className={`p-4 border-2 rounded-2xl transition-all hover:scale-105 ${
               currentLayout === 'right' 
-                ? 'border-primary bg-primary/10' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-primary bg-primary/10 shadow-lg' 
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
             }`}
           >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-full h-8 bg-muted rounded flex items-end justify-end p-1">
-                <div className="w-1/2 h-full bg-foreground/30 rounded" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-full h-8 bg-muted rounded-lg flex items-end justify-end p-1">
+                <div className="w-1/2 h-full bg-foreground/30 rounded-md" />
               </div>
-              <span className="text-xs text-foreground">Справа</span>
+              <span className="text-xs font-medium text-foreground">Справа</span>
             </div>
           </button>
           <button
             onClick={() => handleLayoutChange('full')}
-            className={`p-3 border rounded-lg transition-all bg-card ${
+            className={`p-4 border-2 rounded-2xl transition-all hover:scale-105 ${
               currentLayout === 'full' 
-                ? 'border-primary bg-primary/10' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-primary bg-primary/10 shadow-lg' 
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
             }`}
           >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-full h-8 bg-foreground/30 rounded" />
-              <span className="text-xs text-foreground">Полный</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-full h-8 bg-foreground/30 rounded-lg" />
+              <span className="text-xs font-medium text-foreground">Полный</span>
             </div>
           </button>
         </div>

@@ -28,10 +28,10 @@ const ThemeToggle = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all"
+      className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all backdrop-blur-md bg-background/80 border-2"
       title={theme === 'light' ? 'Переключить на темную тему' : 'Переключить на светлую тему'}
     >
-      <Icon name={theme === 'light' ? 'Moon' : 'Sun'} size={20} />
+      <Icon name={theme === 'light' ? 'Moon' : 'Sun'} size={22} />
     </Button>
   );
 };
