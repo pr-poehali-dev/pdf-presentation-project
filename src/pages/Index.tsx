@@ -198,9 +198,16 @@ const Index = () => {
         container.style.position = 'fixed';
         container.style.left = '-9999px';
         container.style.top = '0';
-        container.style.background = backgroundImage ? `url(${backgroundImage})` : '#ffffff';
-        container.style.backgroundSize = 'cover';
-        container.style.backgroundPosition = 'center';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        if (backgroundImage) {
+          container.style.background = `url(${backgroundImage})`;
+          container.style.backgroundSize = 'cover';
+          container.style.backgroundPosition = 'center';
+          container.style.backgroundRepeat = 'no-repeat';
+        } else {
+          container.style.background = '#ffffff';
+        }
         document.body.appendChild(container);
         
         const tempDiv = document.createElement('div');
@@ -365,6 +372,7 @@ const Index = () => {
         
         const actualHeight = Math.max(container.scrollHeight, 1440);
         container.style.height = actualHeight + 'px';
+        container.style.minHeight = actualHeight + 'px';
         
         const canvas = await html2canvas(container, {
           scale: 1.5,
