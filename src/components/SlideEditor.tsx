@@ -5,6 +5,23 @@ import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Block {
   id: string;
@@ -180,11 +197,47 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     notifyParent(blocks, newLayout);
   };
 
-  const renderBlock = (block: Block, index: number) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = blocks.findIndex((b) => b.id === active.id);
+      const newIndex = blocks.findIndex((b) => b.id === over.id);
+
+      const newBlocks = arrayMove(blocks, oldIndex, newIndex);
+      setBlocks(newBlocks);
+      notifyParent(newBlocks);
+    }
+  };
+
+  const SortableBlock = ({ block, index }: { block: Block; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: block.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
       <div 
-        key={block.id} 
-        className={`group relative border rounded-lg p-4 mb-4 transition-colors ${
+        ref={setNodeRef}
+        style={style}
+        className={`group relative border rounded-lg p-4 mb-4 transition-colors bg-card ${
           focusedBlockId === block.id 
             ? 'border-primary ring-2 ring-primary/20' 
             : 'border-border hover:border-primary'
@@ -198,6 +251,16 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
         tabIndex={0}
       >
         <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-7 w-7 p-0 cursor-grab active:cursor-grabbing"
+            title="Перетащить"
+            {...attributes}
+            {...listeners}
+          >
+            <Icon name="GripVertical" size={14} />
+          </Button>
           <Button
             size="sm"
             variant="secondary"
@@ -437,7 +500,21 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
         className="hidden"
         onChange={handleImageUpload}
       />
-      {blocks.map((block, index) => renderBlock(block, index))}
+      
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={blocks.map(b => b.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {blocks.map((block, index) => (
+            <SortableBlock key={block.id} block={block} index={index} />
+          ))}
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };

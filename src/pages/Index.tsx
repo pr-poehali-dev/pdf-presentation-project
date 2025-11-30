@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface Slide {
   id: number;
@@ -284,6 +285,8 @@ const Index = () => {
           animation: fade-in 0.5s ease-out;
         }
       `}</style>
+      
+      <ThemeToggle />
     </div>
   );
 };
