@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
-import pptxgen from 'pptxgenjs';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -176,97 +175,61 @@ const Index = () => {
   };
 
   const handleExportPPTX = async (slideIndices?: number[]) => {
-    const loadingToast = toast.loading('Генерация PPTX...');
+    const slidesToExport = slideIndices || slides.map((_, idx) => idx);
     
-    try {
-      const pptx = new pptxgen();
-      pptx.layout = 'LAYOUT_16x9';
-      pptx.author = 'Презентация Усадьба Эрзи';
-      pptx.company = 'Усадьба Эрзи';
-      pptx.title = settings.mainTitle;
-
-      const slidesToExport = slideIndices || slides.map((_, idx) => idx);
+    let textContent = `${settings.mainTitle}\n\n`;
+    textContent += `Количество слайдов: ${slidesToExport.length}\n\n`;
+    textContent += '═'.repeat(50) + '\n\n';
+    
+    slidesToExport.forEach((i) => {
+      const slideData = slides[i];
+      textContent += `СЛАЙД ${i + 1}: ${slideData.name || slideData.title}\n`;
+      textContent += '─'.repeat(50) + '\n';
       
-      for (const i of slidesToExport) {
-        const slideData = slides[i];
-        const pptxSlide = pptx.addSlide();
-        
-        pptxSlide.background = { color: 'FFFFFF' };
-        
-        const titleY = slideData.layout === 'center' ? 2.0 : 1.0;
-        
-        if (slideData.title) {
-          pptxSlide.addText(slideData.title, {
-            x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
-            y: titleY,
-            w: slideData.layout === 'center' ? 7 : 5,
-            h: 1.0,
-            fontSize: 36,
-            bold: true,
-            color: '000000',
-            align: slideData.layout === 'center' ? 'center' : 'left',
-            fontFace: 'Arial'
-          });
-        }
-        
-        if (slideData.subtitle) {
-          pptxSlide.addText(slideData.subtitle, {
-            x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
-            y: titleY + 1.2,
-            w: slideData.layout === 'center' ? 7 : 5,
-            h: 0.8,
-            fontSize: 24,
-            color: '666666',
-            align: slideData.layout === 'center' ? 'center' : 'left',
-            fontFace: 'Arial'
-          });
-        }
-        
-        if (slideData.content) {
-          const contentHtml = slideData.content
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/g, ' ')
-            .trim();
-          
-          if (contentHtml) {
-            pptxSlide.addText(contentHtml, {
-              x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
-              y: titleY + 2.2,
-              w: slideData.layout === 'center' ? 7 : 5,
-              h: 2.0,
-              fontSize: 16,
-              color: '333333',
-              align: slideData.layout === 'center' ? 'center' : 'left',
-              fontFace: 'Arial',
-              valign: 'top'
-            });
-          }
-        }
-        
-        if (slideData.image && slideData.image.startsWith('data:')) {
-          const imgX = slideData.layout === 'left' ? 0.5 : slideData.layout === 'right' ? 5.5 : 3.0;
-          const imgY = slideData.layout === 'center' ? 4.5 : 1.5;
-          const imgW = slideData.layout === 'center' ? 4.0 : 3.5;
-          const imgH = slideData.layout === 'center' ? 2.5 : 3.0;
-          
-          pptxSlide.addImage({
-            data: slideData.image,
-            x: imgX,
-            y: imgY,
-            w: imgW,
-            h: imgH
-          });
+      if (slideData.title) {
+        textContent += `Заголовок: ${slideData.title}\n`;
+      }
+      if (slideData.subtitle) {
+        textContent += `Подзаголовок: ${slideData.subtitle}\n`;
+      }
+      if (slideData.content) {
+        const cleanContent = slideData.content
+          .replace(/<[^>]*>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .trim();
+        if (cleanContent) {
+          textContent += `Контент:\n${cleanContent}\n`;
         }
       }
-
-      await pptx.writeFile({ fileName: 'presentation-usadba-erzi.pptx' });
-      toast.success('PPTX успешно экспортирован!', { id: loadingToast });
-      setShowExportDialog(false);
-      setSelectedSlides([]);
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error('Ошибка при экспорте PPTX', { id: loadingToast });
-    }
+      if (slideData.image) {
+        textContent += `Изображение: ${slideData.image.substring(0, 50)}...\n`;
+      }
+      if (slideData.background) {
+        textContent += `Фон: ${slideData.background.substring(0, 50)}...\n`;
+      }
+      textContent += '\n';
+    });
+    
+    textContent += '\n═'.repeat(50) + '\n';
+    textContent += 'Инструкция для создания PPTX:\n';
+    textContent += '1. Откройте PowerPoint\n';
+    textContent += '2. Создайте новую презентацию в формате 16:9\n';
+    textContent += '3. Скопируйте текст каждого слайда из этого файла\n';
+    textContent += '4. Добавьте изображения и фоны вручную\n';
+    
+    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'presentation-content.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Контент презентации сохранён в TXT файл');
+    setShowExportDialog(false);
+    setSelectedSlides([]);
   };
 
   const handleExportClick = () => {
@@ -515,8 +478,8 @@ const Index = () => {
             )}
             <Button onClick={handleExportClick} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
               <Icon name="Download" size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden sm:inline">Экспорт PPTX</span>
-              <span className="sm:hidden">PPTX</span>
+              <span className="hidden sm:inline">Экспорт контента</span>
+              <span className="sm:hidden">TXT</span>
             </Button>
             {isAuthenticated && (
               <>
@@ -796,9 +759,9 @@ const Index = () => {
       <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
         <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold">Экспорт презентации</DialogTitle>
+            <DialogTitle className="text-center text-2xl font-bold">Экспорт контента презентации</DialogTitle>
             <DialogDescription className="text-center">
-              Выберите режим экспорта презентации в PowerPoint формат
+              Выберите слайды для экспорта в текстовый файл
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 pt-4">
