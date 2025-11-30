@@ -585,17 +585,24 @@ const Index = () => {
   return (
     <div className="min-h-screen relative" style={{ background: currentSlideBackground ? 'transparent' : 'var(--background)' }}>
       {currentSlideBackground && (
-        <div 
-          className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
-          style={{ 
-            backgroundImage: `url(${currentSlideBackground})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            zIndex: 0
-          }}
-        />
+        <>
+          <div 
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700"
+            style={{ 
+              backgroundImage: `url(${currentSlideBackground})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              zIndex: 0
+            }}
+            key={currentSlideBackground}
+          />
+          <div 
+            className="fixed inset-0 bg-background/40 dark:bg-background/60 transition-all duration-700"
+            style={{ zIndex: 0 }}
+          />
+        </>
       )}
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8" style={{ position: 'relative', zIndex: 1 }} key={`content-${currentSlide}`}>
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
             <div>

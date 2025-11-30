@@ -42,16 +42,36 @@ interface SlideEditorProps {
 const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: SlideEditorProps) => {
   const [currentLayout, setCurrentLayout] = useState<'center' | 'left' | 'right' | 'full'>(layout);
   const [blocks, setBlocks] = useState<Block[]>(() => {
-    const initialBlocks: Block[] = [
-      { id: '1', type: 'title', content: title },
-      { id: '2', type: 'subtitle', content: subtitle }
-    ];
-
-    if (image) {
-      initialBlocks.push({ id: '3', type: 'image', content: image });
+    const initialBlocks: Block[] = [];
+    let blockIdCounter = 1;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    const children = Array.from(tempDiv.children);
+    
+    if (children.length === 0) {
+      initialBlocks.push({ id: String(blockIdCounter++), type: 'title', content: title });
+      initialBlocks.push({ id: String(blockIdCounter++), type: 'subtitle', content: subtitle });
+      if (image) {
+        initialBlocks.push({ id: String(blockIdCounter++), type: 'image', content: image });
+      }
+      initialBlocks.push({ id: String(blockIdCounter++), type: 'text', content: content || 'Текст' });
+    } else {
+      children.forEach((child) => {
+        if (child.tagName === 'H2') {
+          initialBlocks.push({ id: String(blockIdCounter++), type: 'title', content: child.textContent || '' });
+        } else if (child.tagName === 'DIV' && child.className === '' && child.textContent && child.textContent.length < 100 && child.getAttribute('style')?.includes('border-radius: 9999px')) {
+          initialBlocks.push({ id: String(blockIdCounter++), type: 'subtitle', content: child.textContent });
+        } else {
+          initialBlocks.push({ id: String(blockIdCounter++), type: 'text', content: child.innerHTML });
+        }
+      });
+      
+      if (image) {
+        initialBlocks.push({ id: String(blockIdCounter++), type: 'image', content: image });
+      }
     }
-
-    initialBlocks.push({ id: '4', type: 'text', content: content });
 
     return initialBlocks;
   });
