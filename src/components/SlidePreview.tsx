@@ -138,7 +138,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
   return (
     <>
-      <div className={`${fullSize ? 'min-h-0' : 'min-h-[300px]'} bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden`}>
+      <div className={`${fullSize ? 'min-h-0' : 'min-h-[300px]'} bg-background/40 backdrop-blur-xl border border-border/30 relative rounded-2xl overflow-hidden`}>
         {renderContent()}
       </div>
       
