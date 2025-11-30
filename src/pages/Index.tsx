@@ -329,16 +329,32 @@ const Index = () => {
           }
           contentDiv.appendChild(textContainer);
         } else if (slide.layout === 'full') {
+          contentDiv.style.padding = '60px';
+          contentDiv.style.gap = '40px';
+          contentDiv.style.justifyContent = 'flex-start';
+          
           if (slide.image) {
+            const imageContainer = document.createElement('div');
+            imageContainer.style.width = '100%';
+            imageContainer.style.height = '600px';
+            imageContainer.style.borderRadius = '24px';
+            imageContainer.style.overflow = 'hidden';
+            imageContainer.style.display = 'flex';
+            imageContainer.style.alignItems = 'center';
+            imageContainer.style.justifyContent = 'center';
+            imageContainer.style.flexShrink = '0';
+            
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
             imageEl.style.width = '100%';
-            imageEl.style.maxHeight = '500px';
+            imageEl.style.height = '100%';
             imageEl.style.objectFit = 'contain';
-            imageEl.style.borderRadius = '16px';
-            imageEl.style.marginBottom = '40px';
-            contentDiv.insertBefore(imageEl, textContainer);
+            imageContainer.appendChild(imageEl);
+            contentDiv.appendChild(imageContainer);
           }
+          
+          textContainer.style.flex = '0';
+          textContainer.style.flexShrink = '0';
           contentDiv.appendChild(textContainer);
         }
         
