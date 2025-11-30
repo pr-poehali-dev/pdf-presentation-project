@@ -18,6 +18,7 @@ interface Slide {
   content: string;
   image: string;
   layout: 'center' | 'left' | 'right' | 'full';
+  background?: string;
 }
 
 interface AppSettings {
@@ -37,6 +38,8 @@ const Index = () => {
   const [loginInput, setLoginInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [backgroundImage, setBackgroundImage] = useState<string>('');
+  const [showBackgroundDialog, setShowBackgroundDialog] = useState(false);
+  const [selectedSlideForBg, setSelectedSlideForBg] = useState<number | null>(null);
   const [settings, setSettings] = useState<AppSettings>({
     mainTitle: 'Презентация продвижения',
     mainTitleColor: '',
@@ -191,6 +194,7 @@ const Index = () => {
         if (idx > 0) pdf.addPage();
         
         const slide = slides[i];
+        const slideBackground = slide.background || backgroundImage;
         
         const container = document.createElement('div');
         container.style.width = '2560px';
@@ -200,8 +204,8 @@ const Index = () => {
         container.style.top = '0';
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
-        if (backgroundImage) {
-          container.style.background = `url(${backgroundImage})`;
+        if (slideBackground) {
+          container.style.background = `url(${slideBackground})`;
           container.style.backgroundSize = 'cover';
           container.style.backgroundPosition = 'center';
           container.style.backgroundRepeat = 'no-repeat';
@@ -417,17 +421,32 @@ const Index = () => {
 
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && selectedSlideForBg !== null) {
       try {
         const compressed = await compressBackgroundImage(file);
-        setBackgroundImage(compressed);
-        toast.success('Фоновое изображение установлено');
+        const updatedSlides = [...slides];
+        updatedSlides[selectedSlideForBg].background = compressed;
+        setSlides(updatedSlides);
+        toast.success('Фон слайда установлен');
+        setShowBackgroundDialog(false);
+        setSelectedSlideForBg(null);
       } catch (error) {
         console.error('Background upload error:', error);
         toast.error('Ошибка при загрузке фона. Попробуйте меньший размер изображения.');
       }
     }
     if (e.target) e.target.value = '';
+  };
+  
+  const handleRemoveSlideBackground = (slideIndex: number) => {
+    const updatedSlides = [...slides];
+    updatedSlides[slideIndex].background = '';
+    setSlides(updatedSlides);
+    toast.success('Фон слайда удалён');
+  };
+  
+  const handleBackgroundClick = () => {
+    setShowBackgroundDialog(true);
   };
   
   const compressBackgroundImage = (file: File): Promise<string> => {
@@ -509,13 +528,15 @@ const Index = () => {
     }
   };
 
+  const currentSlideBackground = slides[currentSlide]?.background || backgroundImage;
+  
   return (
-    <div className="min-h-screen relative" style={{ background: backgroundImage ? 'transparent' : 'var(--background)' }}>
-      {backgroundImage && (
+    <div className="min-h-screen relative" style={{ background: currentSlideBackground ? 'transparent' : 'var(--background)' }}>
+      {currentSlideBackground && (
         <div 
-          className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
           style={{ 
-            backgroundImage: `url(${backgroundImage})`,
+            backgroundImage: `url(${currentSlideBackground})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             zIndex: 0
@@ -576,24 +597,12 @@ const Index = () => {
               <>
                 <Button
                   variant="outline"
-                  onClick={() => document.getElementById('background-upload')?.click()}
+                  onClick={handleBackgroundClick}
                   className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base"
                 >
                   <Icon name="Image" size={16} className="sm:w-[18px] sm:h-[18px]" />
                   <span className="hidden sm:inline">Фон</span>
                 </Button>
-                {backgroundImage && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setBackgroundImage('');
-                      toast.success('Фон удалён');
-                    }}
-                    className="flex items-center gap-2 text-sm sm:text-base"
-                  >
-                    <Icon name="X" size={16} className="sm:w-[18px] sm:h-[18px]" />
-                  </Button>
-                )}
                 <BackupManager
                   slides={slides}
                   settings={settings}
@@ -608,13 +617,6 @@ const Index = () => {
                 >
                   <Icon name="LogOut" size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </Button>
-                <input
-                  id="background-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleBackgroundUpload}
-                />
               </>
             )}
           </div>
@@ -622,7 +624,7 @@ const Index = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
-            <Card className={`p-3 sm:p-4 shadow-lg ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+            <Card className={`p-3 sm:p-4 shadow-lg ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
               <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
                 Слайды
               </h3>
@@ -631,13 +633,18 @@ const Index = () => {
                   <button
                     key={slide.id}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-full text-left p-3 rounded-xl transition-all ${
+                    className={`w-full text-left p-3 rounded-xl transition-all relative ${
                       currentSlide === index
                         ? 'bg-primary text-primary-foreground shadow-lg scale-[1.02]'
                         : 'bg-muted hover:bg-muted/80 hover:scale-[1.01]'
                     }`}
                   >
-                    <div className="text-xs font-semibold mb-1">Слайд {index + 1}</div>
+                    <div className="text-xs font-semibold mb-1 flex items-center justify-between">
+                      <span>Слайд {index + 1}</span>
+                      {slide.background && (
+                        <Icon name="Image" size={12} className="opacity-60" />
+                      )}
+                    </div>
                     <div className="text-sm line-clamp-1">{slide.title}</div>
                   </button>
                 ))}
@@ -702,7 +709,7 @@ const Index = () => {
           <div className="lg:col-span-9">
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <Card className={`shadow-lg overflow-hidden ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                <Card className={`shadow-lg overflow-hidden ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
                   <div className="relative">
                     <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
                     <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
@@ -724,7 +731,7 @@ const Index = () => {
                 </Card>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className={`shadow-xl overflow-hidden ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                  <Card className={`shadow-xl overflow-hidden ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
                     <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
                       <SlidePreview
                         key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
@@ -740,7 +747,7 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <Card className={`overflow-hidden shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
+              <Card className={`overflow-hidden shadow-xl ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
                 <SlidePreview
                   key={`preview-${currentSlide}-${slides[currentSlide].id}`}
                   title={slides[currentSlide].title}
@@ -1053,6 +1060,67 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <Dialog open={showBackgroundDialog} onOpenChange={setShowBackgroundDialog}>
+        <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">Выбор фона для слайда</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p className="text-sm text-muted-foreground text-center">Выберите слайд, для которого хотите установить фон</p>
+            <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+              {slides.map((slide, index) => (
+                <div
+                  key={slide.id}
+                  className="flex items-center gap-4 p-4 border-2 rounded-xl transition-all hover:shadow-md bg-card border-border hover:border-primary/50"
+                >
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold mb-1">Слайд {index + 1}</div>
+                    <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
+                    {slide.background && (
+                      <div className="text-xs text-primary mt-1 flex items-center gap-1">
+                        <Icon name="Check" size={12} />
+                        Фон установлен
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSlideForBg(index);
+                        document.getElementById('background-upload')?.click();
+                      }}
+                      className="rounded-xl"
+                    >
+                      <Icon name="Upload" size={14} className="mr-2" />
+                      Загрузить
+                    </Button>
+                    {slide.background && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleRemoveSlideBackground(index)}
+                        className="rounded-xl"
+                      >
+                        <Icon name="X" size={14} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <input
+        id="background-upload"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleBackgroundUpload}
+      />
     </div>
   );
 };
