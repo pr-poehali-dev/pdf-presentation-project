@@ -212,10 +212,11 @@ const Index = () => {
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
         if (slideBackground) {
-          container.style.background = `url(${slideBackground})`;
-          container.style.backgroundSize = 'cover';
+          container.style.backgroundImage = `url(${slideBackground})`;
+          container.style.backgroundSize = 'contain';
           container.style.backgroundPosition = 'center';
           container.style.backgroundRepeat = 'no-repeat';
+          container.style.backgroundColor = '#ffffff';
         } else {
           container.style.background = '#ffffff';
         }
