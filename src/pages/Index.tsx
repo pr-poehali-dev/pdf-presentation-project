@@ -672,14 +672,14 @@ const Index = () => {
           <div className="lg:col-span-9">
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <Card className={`shadow-lg ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                <Card className={`shadow-lg overflow-hidden ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
                   <div className="relative">
-                    <div className="absolute top-0 left-0 right-4 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10 rounded-t-2xl"></div>
-                    <div className="absolute bottom-0 left-0 right-4 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10 rounded-b-2xl"></div>
+                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
                     <div className="p-4">
                       <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
                     </div>
-                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 custom-scrollbar">
+                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 pr-2 custom-scrollbar-inset">
                       <SlideEditor
                         key={currentSlide}
                         title={slides[currentSlide].title}
@@ -694,8 +694,8 @@ const Index = () => {
                 </Card>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className={`shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
-                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar">
+                  <Card className={`shadow-xl overflow-hidden ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
                       <SlidePreview
                         key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
                         title={slides[currentSlide].title}
@@ -739,8 +739,10 @@ const Index = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all ${
-                      currentSlide === index ? 'bg-primary w-8' : 'bg-muted-foreground/30'
+                    className={`w-2.5 h-2.5 rounded-full transition-all border-2 ${
+                      currentSlide === index 
+                        ? 'bg-primary border-primary w-8' 
+                        : 'bg-background border-primary/40'
                     }`}
                   />
                 ))}

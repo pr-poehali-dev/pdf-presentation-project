@@ -124,6 +124,28 @@
     scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
   }
 
+  .custom-scrollbar-inset::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar-inset::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar-inset::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.4);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar-inset::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.6);
+  }
+
+  .custom-scrollbar-inset {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.4) transparent;
+  }
+
   .ql-toolbar {
     border-radius: 0.75rem 0.75rem 0 0 !important;
     border-color: hsl(var(--border)) !important;
