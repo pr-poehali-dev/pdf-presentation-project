@@ -191,21 +191,7 @@ const Index = () => {
         const slideData = slides[i];
         const pptxSlide = pptx.addSlide();
         
-        if (slideData.background || backgroundImage) {
-          pptxSlide.background = { 
-            path: slideData.background || backgroundImage 
-          };
-        }
-        
-        if (slideData.showLogo && settings.logo) {
-          pptxSlide.addImage({
-            path: settings.logo,
-            x: 0.5,
-            y: 0.5,
-            w: 1.5,
-            h: 0.8
-          });
-        }
+        pptxSlide.background = { color: 'FFFFFF' };
         
         const titleY = slideData.layout === 'center' ? 2.0 : 1.0;
         
@@ -257,14 +243,14 @@ const Index = () => {
           }
         }
         
-        if (slideData.image) {
+        if (slideData.image && slideData.image.startsWith('data:')) {
           const imgX = slideData.layout === 'left' ? 0.5 : slideData.layout === 'right' ? 5.5 : 3.0;
           const imgY = slideData.layout === 'center' ? 4.5 : 1.5;
           const imgW = slideData.layout === 'center' ? 4.0 : 3.5;
           const imgH = slideData.layout === 'center' ? 2.5 : 3.0;
           
           pptxSlide.addImage({
-            path: slideData.image,
+            data: slideData.image,
             x: imgX,
             y: imgY,
             w: imgW,
