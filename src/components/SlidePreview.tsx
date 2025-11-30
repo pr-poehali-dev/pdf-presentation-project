@@ -33,7 +33,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     );
 
     const imageBlock = (
-      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : fullSize ? 'flex-1 min-h-[250px]' : 'flex-1 min-h-[150px]'} rounded-lg flex items-center justify-center ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
+      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : fullSize ? 'flex-1 min-h-[250px]' : 'flex-1 min-h-[150px]'} rounded-lg flex items-center justify-center overflow-hidden ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
         {image ? (
           <img 
             src={image} 
