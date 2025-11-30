@@ -49,12 +49,18 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     notifyParent(updatedBlocks);
   };
 
-  const addBlock = (afterId: string, type: 'text' | 'image') => {
+  const addBlock = (afterId: string, type: 'text' | 'image' | 'title' | 'subtitle') => {
     const index = blocks.findIndex(b => b.id === afterId);
+    
+    let defaultContent = '';
+    if (type === 'title') defaultContent = 'Новый заголовок';
+    else if (type === 'subtitle') defaultContent = 'Новый подзаголовок';
+    else if (type === 'text') defaultContent = 'Новый текстовый блок';
+    
     const newBlock: Block = {
       id: Date.now().toString(),
       type,
-      content: type === 'image' ? '' : 'Новый текстовый блок'
+      content: defaultContent
     };
     
     const updatedBlocks = [
@@ -63,6 +69,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
       ...blocks.slice(index + 1)
     ];
     setBlocks(updatedBlocks);
+    notifyParent(updatedBlocks);
     
     if (type === 'image') {
       setTargetBlockId(newBlock.id);
@@ -71,7 +78,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
   };
 
   const deleteBlock = (id: string) => {
-    if (blocks.length <= 2) {
+    if (blocks.length <= 1) {
       toast.error('Нельзя удалить все блоки');
       return;
     }
@@ -107,16 +114,16 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
   };
 
   const notifyParent = (updatedBlocks: Block[], newLayout?: 'center' | 'left' | 'right' | 'full') => {
-    const titleBlock = updatedBlocks.find(b => b.type === 'title');
-    const subtitleBlock = updatedBlocks.find(b => b.type === 'subtitle');
-    const imageBlock = updatedBlocks.find(b => b.type === 'image');
+    const titleBlocks = updatedBlocks.filter(b => b.type === 'title');
+    const subtitleBlocks = updatedBlocks.filter(b => b.type === 'subtitle');
+    const imageBlocks = updatedBlocks.filter(b => b.type === 'image');
     const textBlocks = updatedBlocks.filter(b => b.type === 'text');
 
     onUpdate({
-      title: titleBlock?.content || '',
-      subtitle: subtitleBlock?.content || '',
+      title: titleBlocks.map(b => b.content).join(' • '),
+      subtitle: subtitleBlocks.map(b => b.content).join(' • '),
       content: textBlocks.map(b => b.content).join('\n\n'),
-      image: imageBlock?.content || '',
+      image: imageBlocks.find(b => b.content)?.content || '',
       layout: newLayout || currentLayout
     });
   };
@@ -148,16 +155,14 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           >
             <Icon name="ChevronDown" size={14} />
           </Button>
-          {block.type !== 'title' && block.type !== 'subtitle' && (
-            <Button
-              size="sm"
-              variant="destructive"
-              className="h-7 w-7 p-0"
-              onClick={() => deleteBlock(block.id)}
-            >
-              <Icon name="Trash2" size={14} />
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="destructive"
+            className="h-7 w-7 p-0"
+            onClick={() => deleteBlock(block.id)}
+          >
+            <Icon name="Trash2" size={14} />
+          </Button>
         </div>
 
         {block.type === 'title' && (
@@ -234,14 +239,32 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           </div>
         )}
 
-        <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+        <div className="flex gap-2 mt-3 pt-3 border-t border-border flex-wrap">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => addBlock(block.id, 'title')}
+            className="text-xs"
+          >
+            <Icon name="Heading1" size={14} className="mr-1" />
+            Заголовок
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => addBlock(block.id, 'subtitle')}
+            className="text-xs"
+          >
+            <Icon name="Heading2" size={14} className="mr-1" />
+            Подзаголовок
+          </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => addBlock(block.id, 'text')}
             className="text-xs"
           >
-            <Icon name="Plus" size={14} className="mr-1" />
+            <Icon name="Type" size={14} className="mr-1" />
             Текст
           </Button>
           <Button
