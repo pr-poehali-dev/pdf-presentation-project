@@ -108,9 +108,18 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-6 md:p-8 lg:p-10 min-h-full' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
-            {image && imageBlock}
-            <div className="flex-shrink-0">
+          <div className="flex flex-col h-full">
+            {image && (
+              <div className={`w-full ${fullSize ? 'h-64 sm:h-80 md:h-96' : 'h-48 sm:h-56 md:h-64'} rounded-t-2xl overflow-hidden flex-shrink-0`}>
+                <img 
+                  src={image} 
+                  alt={title}
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setIsImageOpen(true)}
+                />
+              </div>
+            )}
+            <div className={`${fullSize ? 'p-4 sm:p-6 md:p-8 lg:p-10' : 'p-4 sm:p-6 md:p-8'} flex-shrink-0`}>
               {contentBlock}
             </div>
           </div>

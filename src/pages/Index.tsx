@@ -329,33 +329,34 @@ const Index = () => {
           }
           contentDiv.appendChild(textContainer);
         } else if (slide.layout === 'full') {
-          contentDiv.style.padding = '60px';
-          contentDiv.style.gap = '40px';
+          contentDiv.style.padding = '0';
+          contentDiv.style.gap = '0';
           contentDiv.style.justifyContent = 'flex-start';
           
           if (slide.image) {
             const imageContainer = document.createElement('div');
             imageContainer.style.width = '100%';
-            imageContainer.style.height = '600px';
-            imageContainer.style.borderRadius = '24px';
+            imageContainer.style.height = '700px';
+            imageContainer.style.borderRadius = '24px 24px 0 0';
             imageContainer.style.overflow = 'hidden';
-            imageContainer.style.display = 'flex';
-            imageContainer.style.alignItems = 'center';
-            imageContainer.style.justifyContent = 'center';
             imageContainer.style.flexShrink = '0';
             
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
             imageEl.style.width = '100%';
             imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'contain';
+            imageEl.style.objectFit = 'cover';
             imageContainer.appendChild(imageEl);
             contentDiv.appendChild(imageContainer);
           }
           
+          const textWrapper = document.createElement('div');
+          textWrapper.style.padding = '60px 80px';
+          textWrapper.style.flexShrink = '0';
           textContainer.style.flex = '0';
-          textContainer.style.flexShrink = '0';
-          contentDiv.appendChild(textContainer);
+          textContainer.style.maxWidth = '100%';
+          textWrapper.appendChild(textContainer);
+          contentDiv.appendChild(textWrapper);
         }
         
         cardWrapper.appendChild(contentDiv);
