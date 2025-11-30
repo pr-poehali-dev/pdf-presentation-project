@@ -191,220 +191,40 @@ const Index = () => {
       const wasEditing = isEditing;
       if (wasEditing) setIsEditing(false);
       
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const slidesToExport = slideIndices || slides.map((_, idx) => idx);
+      const originalSlide = currentSlide;
       
       for (let idx = 0; idx < slidesToExport.length; idx++) {
         const i = slidesToExport[idx];
         if (idx > 0) pdf.addPage();
         
-        const slide = slides[i];
-        const slideBackground = slide.background || backgroundImage;
+        setCurrentSlide(i);
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        const container = document.createElement('div');
-        container.style.width = '2560px';
-        container.style.height = '1440px';
-        container.style.position = 'fixed';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.overflow = 'hidden';
-        if (slideBackground) {
-          container.style.backgroundImage = `url(${slideBackground})`;
-          container.style.backgroundSize = 'cover';
-          container.style.backgroundPosition = 'center';
-          container.style.backgroundRepeat = 'no-repeat';
-        } else {
-          container.style.background = '#ffffff';
-        }
-        document.body.appendChild(container);
+        const slideElement = document.getElementById(`slide-preview-${i}`);
         
-        if (settings.logo && slide.showLogo) {
-          const logoEl = document.createElement('img');
-          logoEl.src = settings.logo;
-          logoEl.style.position = 'absolute';
-          logoEl.style.top = '40px';
-          logoEl.style.left = '40px';
-          logoEl.style.height = 'auto';
-          logoEl.style.width = 'auto';
-          logoEl.style.maxHeight = '240px';
-          logoEl.style.maxWidth = '300px';
-          logoEl.style.objectFit = 'contain';
-          logoEl.style.zIndex = '10';
-          container.appendChild(logoEl);
+        if (!slideElement) {
+          console.error(`Slide element not found for index ${i}`);
+          continue;
         }
         
-        const tempDiv = document.createElement('div');
-        tempDiv.style.width = '100%';
-        tempDiv.style.height = '100%';
-        tempDiv.style.padding = '60px 40px 40px 40px';
-        tempDiv.style.display = 'flex';
-        tempDiv.style.alignItems = 'flex-start';
-        tempDiv.style.justifyContent = 'center';
-        tempDiv.style.paddingTop = '180px';
-        
-        const cardWrapper = document.createElement('div');
-        cardWrapper.style.width = '100%';
-        cardWrapper.style.background = '#ffffff';
-        cardWrapper.style.borderRadius = '24px';
-        cardWrapper.style.overflow = 'hidden';
-        cardWrapper.style.boxShadow = '0 20px 60px rgba(0,0,0,0.15)';
-        cardWrapper.style.position = 'relative';
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.style.width = '100%';
-        contentDiv.style.padding = '80px';
-        contentDiv.style.display = 'flex';
-        contentDiv.style.flexDirection = slide.layout === 'full' ? 'column' : 'row';
-        contentDiv.style.alignItems = slide.layout === 'center' ? 'center' : 'stretch';
-        contentDiv.style.justifyContent = 'center';
-        contentDiv.style.gap = '60px';
-        contentDiv.style.background = 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)';
-        
-
-        const textContainer = document.createElement('div');
-        textContainer.style.flex = slide.layout === 'left' || slide.layout === 'right' ? '1.3' : '1';
-        textContainer.style.display = 'flex';
-        textContainer.style.flexDirection = 'column';
-        textContainer.style.justifyContent = 'center';
-        textContainer.style.maxWidth = slide.layout === 'center' ? '1200px' : 'none';
-        textContainer.style.paddingRight = slide.layout === 'left' ? '40px' : '0';
-        textContainer.style.paddingLeft = slide.layout === 'right' ? '40px' : '0';
-        
-        const contentEl = document.createElement('div');
-        contentEl.innerHTML = slide.content;
-        contentEl.style.fontSize = '38px';
-        contentEl.style.lineHeight = '1.6';
-        contentEl.style.color = '#333333';
-        contentEl.style.fontFamily = 'Open Sans, sans-serif';
-        contentEl.style.fontWeight = '400';
-        contentEl.style.maxWidth = '100%';
-        
-        const titles = contentEl.querySelectorAll('.slide-title');
-        titles.forEach((title: Element) => {
-          (title as HTMLElement).style.fontSize = '72px';
-          (title as HTMLElement).style.marginBottom = '40px';
-        });
-        
-        const subtitles = contentEl.querySelectorAll('.slide-subtitle');
-        subtitles.forEach((subtitle: Element) => {
-          (subtitle as HTMLElement).style.fontSize = '32px';
-          (subtitle as HTMLElement).style.padding = '16px 32px';
-          (subtitle as HTMLElement).style.marginBottom = '40px';
-        });
-        
-        textContainer.appendChild(contentEl);
-        
-        if (slide.layout === 'center') {
-          contentDiv.appendChild(textContainer);
-          if (slide.image) {
-            const bgImage = document.createElement('div');
-            bgImage.style.position = 'absolute';
-            bgImage.style.right = '0';
-            bgImage.style.top = '0';
-            bgImage.style.bottom = '0';
-            bgImage.style.width = '50%';
-            bgImage.style.backgroundImage = `url(${slide.image})`;
-            bgImage.style.backgroundSize = 'cover';
-            bgImage.style.backgroundPosition = 'center';
-            bgImage.style.opacity = '0.12';
-            contentDiv.insertBefore(bgImage, textContainer);
-          }
-        } else if (slide.layout === 'left') {
-          contentDiv.appendChild(textContainer);
-          if (slide.image) {
-            const imageContainer = document.createElement('div');
-            imageContainer.style.flex = '1';
-            imageContainer.style.minWidth = '900px';
-            imageContainer.style.height = '900px';
-            imageContainer.style.overflow = 'hidden';
-            imageContainer.style.borderRadius = '16px';
-            imageContainer.style.display = 'flex';
-            imageContainer.style.alignItems = 'center';
-            imageContainer.style.justifyContent = 'center';
-            
-            const imageEl = document.createElement('img');
-            imageEl.src = slide.image;
-            imageEl.style.width = '100%';
-            imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'cover';
-            imageEl.style.objectPosition = 'center';
-            imageContainer.appendChild(imageEl);
-            contentDiv.appendChild(imageContainer);
-          }
-        } else if (slide.layout === 'right') {
-          if (slide.image) {
-            const imageContainer = document.createElement('div');
-            imageContainer.style.flex = '1';
-            imageContainer.style.minWidth = '900px';
-            imageContainer.style.height = '900px';
-            imageContainer.style.overflow = 'hidden';
-            imageContainer.style.borderRadius = '16px';
-            imageContainer.style.display = 'flex';
-            imageContainer.style.alignItems = 'center';
-            imageContainer.style.justifyContent = 'center';
-            
-            const imageEl = document.createElement('img');
-            imageEl.src = slide.image;
-            imageEl.style.width = '100%';
-            imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'cover';
-            imageEl.style.objectPosition = 'center';
-            imageContainer.appendChild(imageEl);
-            contentDiv.appendChild(imageContainer);
-          }
-          contentDiv.appendChild(textContainer);
-        } else if (slide.layout === 'full') {
-          contentDiv.style.padding = '0';
-          contentDiv.style.gap = '0';
-          contentDiv.style.justifyContent = 'flex-start';
-          
-          if (slide.image) {
-            const imageContainer = document.createElement('div');
-            imageContainer.style.width = '100%';
-            imageContainer.style.height = '900px';
-            imageContainer.style.borderRadius = '24px 24px 0 0';
-            imageContainer.style.overflow = 'hidden';
-            imageContainer.style.flexShrink = '0';
-            
-            const imageEl = document.createElement('img');
-            imageEl.src = slide.image;
-            imageEl.style.width = '100%';
-            imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'cover';
-            imageEl.style.objectPosition = 'center';
-            imageContainer.appendChild(imageEl);
-            contentDiv.appendChild(imageContainer);
-          }
-          
-          const textWrapper = document.createElement('div');
-          textWrapper.style.padding = '60px 80px';
-          textWrapper.style.flexShrink = '0';
-          textContainer.style.flex = '0';
-          textContainer.style.maxWidth = '100%';
-          textWrapper.appendChild(textContainer);
-          contentDiv.appendChild(textWrapper);
+        const parentContainer = slideElement.parentElement?.parentElement;
+        if (!parentContainer) {
+          console.error(`Parent container not found for slide ${i}`);
+          continue;
         }
         
-        cardWrapper.appendChild(contentDiv);
-        tempDiv.appendChild(cardWrapper);
-        container.appendChild(tempDiv);
-        
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const canvas = await html2canvas(container, {
-          scale: 1.5,
+        const canvas = await html2canvas(parentContainer, {
+          scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: slideBackground ? null : '#ffffff',
+          backgroundColor: null,
           logging: false,
-          width: 2560,
-          height: 1440
+          windowWidth: parentContainer.scrollWidth,
+          windowHeight: parentContainer.scrollHeight
         });
-        
-        document.body.removeChild(container);
         
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const imgWidth = 297;
@@ -413,6 +233,7 @@ const Index = () => {
         pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
       }
 
+      setCurrentSlide(originalSlide);
       if (wasEditing) setIsEditing(true);
       
       pdf.save('presentation-usadba-erzi.pdf');
