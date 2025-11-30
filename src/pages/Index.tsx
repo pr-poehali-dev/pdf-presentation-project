@@ -721,7 +721,7 @@ const Index = () => {
                   <Input
                     value={settings.slidesBlockTitle}
                     onChange={(e) => handleUpdateSettings({ slidesBlockTitle: e.target.value })}
-                    className="font-semibold text-sm uppercase tracking-wide h-8 px-2"
+                    className="font-semibold text-sm uppercase tracking-wide h-8 px-2 text-foreground bg-background"
                   />
                 ) : (
                   <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
@@ -745,7 +745,7 @@ const Index = () => {
                           <Input
                             value={slide.name || `Слайд ${index + 1}`}
                             onChange={(e) => handleUpdateSlideName(index, e.target.value)}
-                            className="h-5 px-1 text-xs font-semibold py-0 min-w-0"
+                            className="h-5 px-1 text-xs font-semibold py-0 min-w-0 text-foreground bg-background"
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
