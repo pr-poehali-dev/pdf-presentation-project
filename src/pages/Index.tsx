@@ -244,31 +244,33 @@ const Index = () => {
         const subtitleEl = document.createElement('div');
         subtitleEl.textContent = slide.subtitle;
         subtitleEl.style.display = 'inline-block';
-        subtitleEl.style.padding = '12px 24px';
-        subtitleEl.style.background = 'rgba(89, 181, 96, 0.15)';
-        subtitleEl.style.color = rgbPrimary;
+        subtitleEl.style.padding = '8px 20px';
+        subtitleEl.style.background = 'rgba(0, 0, 0, 0.08)';
+        subtitleEl.style.color = '#333333';
         subtitleEl.style.borderRadius = '999px';
-        subtitleEl.style.fontSize = '22px';
-        subtitleEl.style.fontWeight = '500';
-        subtitleEl.style.marginBottom = '28px';
-        subtitleEl.style.fontFamily = 'Montserrat, sans-serif';
+        subtitleEl.style.fontSize = '20px';
+        subtitleEl.style.fontWeight = '400';
+        subtitleEl.style.marginBottom = '24px';
+        subtitleEl.style.fontFamily = 'Open Sans, sans-serif';
         subtitleEl.style.alignSelf = 'flex-start';
         
         const titleEl = document.createElement('h2');
         titleEl.textContent = slide.title;
-        titleEl.style.fontSize = '64px';
+        titleEl.style.fontSize = '72px';
         titleEl.style.fontWeight = '700';
         titleEl.style.color = rgbPrimary;
-        titleEl.style.marginBottom = '32px';
-        titleEl.style.lineHeight = '1.2';
+        titleEl.style.marginBottom = '28px';
+        titleEl.style.lineHeight = '1.15';
         titleEl.style.fontFamily = 'Montserrat, sans-serif';
+        titleEl.style.letterSpacing = '-0.02em';
         
         const contentEl = document.createElement('div');
         contentEl.innerHTML = slide.content;
-        contentEl.style.fontSize = '24px';
-        contentEl.style.lineHeight = '1.6';
+        contentEl.style.fontSize = '20px';
+        contentEl.style.lineHeight = '1.7';
         contentEl.style.color = '#333333';
         contentEl.style.fontFamily = 'Open Sans, sans-serif';
+        contentEl.style.fontWeight = '400';
         contentEl.style.maxWidth = '100%';
         
         textContainer.appendChild(subtitleEl);
