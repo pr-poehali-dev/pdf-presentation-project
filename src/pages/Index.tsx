@@ -184,15 +184,14 @@ const Index = () => {
         const i = slidesToExport[idx];
         if (idx > 0) pdf.addPage();
         
-        const tempSlide = currentSlide;
-        setCurrentSlide(i);
-        await new Promise(resolve => setTimeout(resolve, 400));
+        const slide = slides[i];
         
         const container = document.createElement('div');
-        container.style.width = '1920px';
-        container.style.height = '1080px';
+        container.style.width = '2560px';
+        container.style.height = '1440px';
         container.style.position = 'fixed';
         container.style.left = '-9999px';
+        container.style.top = '0';
         container.style.background = backgroundImage ? `url(${backgroundImage})` : '#ffffff';
         container.style.backgroundSize = 'cover';
         container.style.backgroundPosition = 'center';
@@ -201,48 +200,143 @@ const Index = () => {
         const tempDiv = document.createElement('div');
         tempDiv.style.width = '100%';
         tempDiv.style.height = '100%';
-        tempDiv.style.padding = '60px';
+        tempDiv.style.padding = '40px';
+        tempDiv.style.display = 'flex';
+        tempDiv.style.alignItems = 'center';
+        tempDiv.style.justifyContent = 'center';
         
         const cardWrapper = document.createElement('div');
         cardWrapper.style.width = '100%';
         cardWrapper.style.height = '100%';
-        cardWrapper.style.background = backgroundImage ? 'rgba(255, 255, 255, 0.7)' : '#ffffff';
-        cardWrapper.style.backdropFilter = backgroundImage ? 'blur(40px)' : 'none';
-        cardWrapper.style.borderRadius = '32px';
+        cardWrapper.style.background = '#ffffff';
+        cardWrapper.style.borderRadius = '24px';
         cardWrapper.style.overflow = 'hidden';
-        cardWrapper.style.border = '1px solid rgba(0,0,0,0.1)';
+        cardWrapper.style.boxShadow = '0 20px 60px rgba(0,0,0,0.15)';
+        cardWrapper.style.position = 'relative';
         
-        const slideElement = document.getElementById(`slide-preview-${i}`);
-        if (slideElement) {
-          const clonedSlide = slideElement.cloneNode(true) as HTMLElement;
-          clonedSlide.style.width = '100%';
-          clonedSlide.style.height = '100%';
-          cardWrapper.appendChild(clonedSlide);
+        const contentDiv = document.createElement('div');
+        contentDiv.style.width = '100%';
+        contentDiv.style.height = '100%';
+        contentDiv.style.padding = '80px';
+        contentDiv.style.display = 'flex';
+        contentDiv.style.flexDirection = slide.layout === 'full' ? 'column' : 'row';
+        contentDiv.style.alignItems = slide.layout === 'center' ? 'center' : 'stretch';
+        contentDiv.style.justifyContent = 'center';
+        contentDiv.style.gap = '60px';
+        contentDiv.style.background = 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)';
+        
+        const textContainer = document.createElement('div');
+        textContainer.style.flex = '1';
+        textContainer.style.display = 'flex';
+        textContainer.style.flexDirection = 'column';
+        textContainer.style.justifyContent = 'center';
+        textContainer.style.maxWidth = slide.layout === 'center' ? '900px' : 'none';
+        
+        const subtitleEl = document.createElement('div');
+        subtitleEl.textContent = slide.subtitle;
+        subtitleEl.style.display = 'inline-block';
+        subtitleEl.style.padding = '12px 24px';
+        subtitleEl.style.background = 'rgba(139, 92, 246, 0.15)';
+        subtitleEl.style.color = '#8b5cf6';
+        subtitleEl.style.borderRadius = '999px';
+        subtitleEl.style.fontSize = '24px';
+        subtitleEl.style.fontWeight = '500';
+        subtitleEl.style.marginBottom = '32px';
+        subtitleEl.style.fontFamily = 'Montserrat, sans-serif';
+        
+        const titleEl = document.createElement('h2');
+        titleEl.textContent = slide.title;
+        titleEl.style.fontSize = '72px';
+        titleEl.style.fontWeight = '700';
+        titleEl.style.color = '#8b5cf6';
+        titleEl.style.marginBottom = '40px';
+        titleEl.style.lineHeight = '1.2';
+        titleEl.style.fontFamily = 'Montserrat, sans-serif';
+        
+        const contentEl = document.createElement('div');
+        contentEl.innerHTML = slide.content;
+        contentEl.style.fontSize = '28px';
+        contentEl.style.lineHeight = '1.6';
+        contentEl.style.color = '#333333';
+        contentEl.style.fontFamily = 'Open Sans, sans-serif';
+        
+        textContainer.appendChild(subtitleEl);
+        textContainer.appendChild(titleEl);
+        textContainer.appendChild(contentEl);
+        
+        if (slide.layout === 'center') {
+          contentDiv.appendChild(textContainer);
+          if (slide.image) {
+            const bgImage = document.createElement('div');
+            bgImage.style.position = 'absolute';
+            bgImage.style.right = '0';
+            bgImage.style.top = '0';
+            bgImage.style.bottom = '0';
+            bgImage.style.width = '50%';
+            bgImage.style.backgroundImage = `url(${slide.image})`;
+            bgImage.style.backgroundSize = 'cover';
+            bgImage.style.backgroundPosition = 'center';
+            bgImage.style.opacity = '0.12';
+            contentDiv.insertBefore(bgImage, textContainer);
+          }
+        } else if (slide.layout === 'left') {
+          contentDiv.appendChild(textContainer);
+          if (slide.image) {
+            const imageEl = document.createElement('img');
+            imageEl.src = slide.image;
+            imageEl.style.flex = '1';
+            imageEl.style.width = '100%';
+            imageEl.style.height = '100%';
+            imageEl.style.objectFit = 'cover';
+            imageEl.style.borderRadius = '16px';
+            contentDiv.appendChild(imageEl);
+          }
+        } else if (slide.layout === 'right') {
+          if (slide.image) {
+            const imageEl = document.createElement('img');
+            imageEl.src = slide.image;
+            imageEl.style.flex = '1';
+            imageEl.style.width = '100%';
+            imageEl.style.height = '100%';
+            imageEl.style.objectFit = 'cover';
+            imageEl.style.borderRadius = '16px';
+            contentDiv.appendChild(imageEl);
+          }
+          contentDiv.appendChild(textContainer);
+        } else if (slide.layout === 'full') {
+          if (slide.image) {
+            const imageEl = document.createElement('img');
+            imageEl.src = slide.image;
+            imageEl.style.width = '100%';
+            imageEl.style.height = '400px';
+            imageEl.style.objectFit = 'cover';
+            imageEl.style.borderRadius = '16px';
+            imageEl.style.marginBottom = '40px';
+            contentDiv.insertBefore(imageEl, textContainer);
+          }
+          contentDiv.appendChild(textContainer);
         }
         
+        cardWrapper.appendChild(contentDiv);
         tempDiv.appendChild(cardWrapper);
         container.appendChild(tempDiv);
         
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         const canvas = await html2canvas(container, {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: null,
+          backgroundColor: backgroundImage ? null : '#ffffff',
           logging: false,
-          width: 1920,
-          height: 1080
+          width: 2560,
+          height: 1440
         });
         
         document.body.removeChild(container);
         
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const imgWidth = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-        
-        setCurrentSlide(tempSlide);
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
       }
 
       if (wasEditing) setIsEditing(true);
@@ -534,6 +628,7 @@ const Index = () => {
                   <Card className={`shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
                     <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar">
                       <SlidePreview
+                        key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
                         title={slides[currentSlide].title}
                         subtitle={slides[currentSlide].subtitle}
                         content={slides[currentSlide].content}
@@ -548,6 +643,7 @@ const Index = () => {
             ) : (
               <Card className={`overflow-hidden shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
                 <SlidePreview
+                  key={`preview-${currentSlide}-${slides[currentSlide].id}`}
                   title={slides[currentSlide].title}
                   subtitle={slides[currentSlide].subtitle}
                   content={slides[currentSlide].content}
