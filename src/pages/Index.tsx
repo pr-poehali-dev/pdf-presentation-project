@@ -45,7 +45,41 @@ const Index = () => {
     adminPassword: 'admin1234'
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  
+  const [slides, setSlides] = useState<Slide[]>([
+    {
+      id: 1,
+      title: 'Эко-поселок на берегу Яхромы',
+      subtitle: 'Усадьба скульптора Эрьзи',
+      content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
+      layout: 'center'
+    },
+    {
+      id: 2,
+      title: 'Стратегия продвижения',
+      subtitle: 'Целевые площадки и каналы',
+      content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
+      layout: 'left'
+    },
+    {
+      id: 3,
+      title: 'Этапы реализации',
+      subtitle: 'Пошаговый план действий',
+      content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
+      layout: 'right'
+    },
+    {
+      id: 4,
+      title: 'Ожидаемые результаты',
+      subtitle: 'Измеримые показатели роста',
+      content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
+      layout: 'left'
+    }
+  ]);
+
   useEffect(() => {
     const savedAuth = localStorage.getItem('isAuthenticated');
     if (savedAuth === 'true') {
@@ -89,40 +123,6 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('slides', JSON.stringify(slides));
   }, [slides]);
-  const [slides, setSlides] = useState<Slide[]>([
-    {
-      id: 1,
-      title: 'Эко-поселок на берегу Яхромы',
-      subtitle: 'Усадьба скульптора Эрьзи',
-      content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
-      layout: 'center'
-    },
-    {
-      id: 2,
-      title: 'Стратегия продвижения',
-      subtitle: 'Целевые площадки и каналы',
-      content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
-      layout: 'left'
-    },
-    {
-      id: 3,
-      title: 'Этапы реализации',
-      subtitle: 'Пошаговый план действий',
-      content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
-      layout: 'right'
-    },
-    {
-      id: 4,
-      title: 'Ожидаемые результаты',
-      subtitle: 'Измеримые показатели роста',
-      content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
-      layout: 'left'
-    }
-  ]);
 
   const handleLogin = () => {
     if (loginInput === settings.adminLogin && passwordInput === settings.adminPassword) {
