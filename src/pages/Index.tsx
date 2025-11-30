@@ -210,62 +210,63 @@ const Index = () => {
           continue;
         }
         
-        const contentContainer = document.querySelector('.lg\\:col-span-9');
-        if (!contentContainer) {
-          console.error(`Content container not found for slide ${i}`);
-          continue;
-        }
-        
-        const navButtons = contentContainer.querySelector('.flex.justify-between.items-center.mt-4');
-        if (navButtons) {
-          (navButtons as HTMLElement).style.display = 'none';
-        }
-        
         const slideBackground = slides[i]?.background || backgroundImage;
-        const tempBackgroundDiv = document.createElement('div');
+        const slideData = slides[i];
+        
+        const exportContainer = document.createElement('div');
+        exportContainer.style.position = 'fixed';
+        exportContainer.style.top = '-10000px';
+        exportContainer.style.left = '0';
+        exportContainer.style.width = '1920px';
+        exportContainer.style.height = '1080px';
+        exportContainer.style.zIndex = '9999';
+        
         if (slideBackground) {
-          tempBackgroundDiv.style.position = 'fixed';
-          tempBackgroundDiv.style.inset = '0';
-          tempBackgroundDiv.style.backgroundImage = `url(${slideBackground})`;
-          tempBackgroundDiv.style.backgroundSize = 'cover';
-          tempBackgroundDiv.style.backgroundPosition = 'center';
-          tempBackgroundDiv.style.zIndex = '-1';
-          document.body.appendChild(tempBackgroundDiv);
-          
-          const overlayDiv = document.createElement('div');
-          overlayDiv.style.position = 'fixed';
-          overlayDiv.style.inset = '0';
-          overlayDiv.style.backgroundColor = document.documentElement.classList.contains('dark') 
-            ? 'rgba(18, 18, 18, 0.6)' 
-            : 'rgba(255, 255, 255, 0.4)';
-          overlayDiv.style.zIndex = '-1';
-          document.body.appendChild(overlayDiv);
-          
-          await new Promise(resolve => setTimeout(resolve, 200));
+          exportContainer.style.backgroundImage = `url(${slideBackground})`;
+          exportContainer.style.backgroundSize = 'cover';
+          exportContainer.style.backgroundPosition = 'center';
+        } else {
+          exportContainer.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#121212' : '#ffffff';
         }
         
-        const canvas = await html2canvas(contentContainer as HTMLElement, {
+        const overlayDiv = document.createElement('div');
+        overlayDiv.style.position = 'absolute';
+        overlayDiv.style.inset = '0';
+        overlayDiv.style.backgroundColor = document.documentElement.classList.contains('dark') 
+          ? 'rgba(18, 18, 18, 0.6)' 
+          : 'rgba(255, 255, 255, 0.4)';
+        exportContainer.appendChild(overlayDiv);
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.style.position = 'relative';
+        contentWrapper.style.zIndex = '10';
+        contentWrapper.style.width = '100%';
+        contentWrapper.style.height = '100%';
+        contentWrapper.style.display = 'flex';
+        contentWrapper.style.alignItems = 'center';
+        contentWrapper.style.justifyContent = 'center';
+        contentWrapper.style.padding = '80px';
+        exportContainer.appendChild(contentWrapper);
+        
+        const clonedSlide = slideElement.cloneNode(true) as HTMLElement;
+        clonedSlide.style.maxWidth = '1400px';
+        clonedSlide.style.width = '100%';
+        contentWrapper.appendChild(clonedSlide);
+        
+        document.body.appendChild(exportContainer);
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const canvas = await html2canvas(exportContainer, {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: slideBackground ? null : '#ffffff',
+          backgroundColor: null,
           logging: false,
-          windowWidth: (contentContainer as HTMLElement).scrollWidth,
-          windowHeight: (contentContainer as HTMLElement).scrollHeight
+          width: 1920,
+          height: 1080
         });
         
-        if (navButtons) {
-          (navButtons as HTMLElement).style.display = '';
-        }
-        
-        if (slideBackground) {
-          const tempDivs = document.querySelectorAll('body > div[style*="position: fixed"]');
-          tempDivs.forEach(div => {
-            if (div.parentElement === document.body && div !== document.querySelector('.container')?.parentElement) {
-              div.remove();
-            }
-          });
-        }
+        document.body.removeChild(exportContainer);
         
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const imgWidth = 297;
