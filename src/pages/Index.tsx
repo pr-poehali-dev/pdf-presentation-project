@@ -194,7 +194,7 @@ const Index = () => {
         
         const container = document.createElement('div');
         container.style.width = '2560px';
-        container.style.height = '1440px';
+        container.style.minHeight = '1440px';
         container.style.position = 'fixed';
         container.style.left = '-9999px';
         container.style.top = '0';
@@ -205,7 +205,7 @@ const Index = () => {
         
         const tempDiv = document.createElement('div');
         tempDiv.style.width = '100%';
-        tempDiv.style.height = '100%';
+        tempDiv.style.minHeight = '100%';
         tempDiv.style.padding = '40px';
         tempDiv.style.display = 'flex';
         tempDiv.style.alignItems = 'center';
@@ -213,7 +213,6 @@ const Index = () => {
         
         const cardWrapper = document.createElement('div');
         cardWrapper.style.width = '100%';
-        cardWrapper.style.height = '100%';
         cardWrapper.style.background = '#ffffff';
         cardWrapper.style.borderRadius = '24px';
         cardWrapper.style.overflow = 'hidden';
@@ -222,7 +221,6 @@ const Index = () => {
         
         const contentDiv = document.createElement('div');
         contentDiv.style.width = '100%';
-        contentDiv.style.height = '100%';
         contentDiv.style.padding = '80px';
         contentDiv.style.display = 'flex';
         contentDiv.style.flexDirection = slide.layout === 'full' ? 'column' : 'row';
@@ -365,6 +363,9 @@ const Index = () => {
         
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        const actualHeight = Math.max(container.scrollHeight, 1440);
+        container.style.height = actualHeight + 'px';
+        
         const canvas = await html2canvas(container, {
           scale: 1.5,
           useCORS: true,
@@ -372,13 +373,17 @@ const Index = () => {
           backgroundColor: backgroundImage ? null : '#ffffff',
           logging: false,
           width: 2560,
-          height: 1440
+          height: actualHeight
         });
         
         document.body.removeChild(container);
         
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+        const imgWidth = 297;
+        const imgHeight = (actualHeight / 2560) * 297;
+        const finalHeight = Math.min(imgHeight, 210);
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, finalHeight, undefined, 'FAST');
       }
 
       if (wasEditing) setIsEditing(true);
