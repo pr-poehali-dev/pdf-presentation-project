@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+
 interface SlidePreviewProps {
   title: string;
   subtitle: string;
@@ -8,6 +11,7 @@ interface SlidePreviewProps {
 }
 
 const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = false }: SlidePreviewProps) => {
+  const [isImageOpen, setIsImageOpen] = useState(false);
   const renderContent = () => {
     const contentBlock = (
       <div className={`${fullSize ? 'max-w-2xl' : 'max-w-md'} animate-fade-in`}>
@@ -21,7 +25,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
           {title}
         </h2>
         <div 
-          className={`${fullSize ? 'text-xl' : 'text-sm'} text-foreground/80 leading-relaxed`}
+          className={`${fullSize ? 'text-base' : 'text-xs'} text-foreground/80 leading-relaxed`}
           style={{ fontFamily: 'Open Sans, sans-serif' }}
           dangerouslySetInnerHTML={{ __html: content }}
         />
@@ -33,7 +37,8 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
         <img 
           src={image} 
           alt={title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => setIsImageOpen(true)}
         />
       </div>
     );
@@ -47,7 +52,8 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
                 <img 
                   src={image} 
                   alt={title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-30 transition-opacity"
+                  onClick={() => setIsImageOpen(true)}
                 />
               </div>
             )}
@@ -91,9 +97,21 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
   };
 
   return (
-    <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
-      {renderContent()}
-    </div>
+    <>
+      <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
+        {renderContent()}
+      </div>
+      
+      <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
+        <DialogContent className="max-w-6xl p-0 bg-transparent border-none" onClick={() => setIsImageOpen(false)}>
+          <img 
+            src={image} 
+            alt={title}
+            className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

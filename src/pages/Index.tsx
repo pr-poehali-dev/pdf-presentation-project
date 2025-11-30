@@ -193,6 +193,7 @@ const Index = () => {
                 <div className="max-h-[700px] overflow-y-auto pr-4">
                   <h3 className="text-lg font-semibold mb-4">Редактор</h3>
                   <SlideEditor
+                    key={currentSlide}
                     title={slides[currentSlide].title}
                     subtitle={slides[currentSlide].subtitle}
                     content={slides[currentSlide].content}
