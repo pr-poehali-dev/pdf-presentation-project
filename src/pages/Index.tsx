@@ -245,12 +245,20 @@ const Index = () => {
         contentWrapper.style.display = 'flex';
         contentWrapper.style.alignItems = 'center';
         contentWrapper.style.justifyContent = 'center';
-        contentWrapper.style.padding = '80px';
+        contentWrapper.style.padding = '60px';
         exportContainer.appendChild(contentWrapper);
         
         const clonedSlide = slideElement.cloneNode(true) as HTMLElement;
-        clonedSlide.style.maxWidth = '1400px';
+        clonedSlide.style.maxWidth = '1600px';
         clonedSlide.style.width = '100%';
+        clonedSlide.style.backgroundColor = document.documentElement.classList.contains('dark') 
+          ? 'rgba(38, 38, 38, 0.95)' 
+          : 'rgba(255, 255, 255, 0.95)';
+        clonedSlide.style.backdropFilter = 'blur(40px)';
+        clonedSlide.style.borderRadius = '16px';
+        clonedSlide.style.border = document.documentElement.classList.contains('dark') 
+          ? '1px solid rgba(64, 64, 64, 0.3)' 
+          : '1px solid rgba(229, 229, 229, 0.3)';
         contentWrapper.appendChild(clonedSlide);
         
         document.body.appendChild(exportContainer);
