@@ -285,17 +285,19 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
       isDragging,
     } = useSortable({ id: block.id });
 
-    const style = {
+    const style: React.CSSProperties = {
       transform: CSS.Transform.toString(transform),
       transition,
-      opacity: isDragging ? 0.5 : 1,
+      opacity: isDragging ? 0.85 : 1,
+      zIndex: isDragging ? 1000 : 'auto',
+      cursor: isDragging ? 'grabbing' : 'default',
     };
 
     return (
       <div 
         ref={setNodeRef}
         style={style}
-        className="group relative border border-border rounded-2xl p-4 mb-4 transition-all bg-card hover:border-primary hover:shadow-lg"
+        className={`group relative border border-border rounded-2xl p-4 mb-4 transition-all bg-card hover:border-primary hover:shadow-lg ${isDragging ? 'shadow-2xl scale-105 border-primary' : ''}`}
       >
         <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-all flex gap-1">
           <Button
