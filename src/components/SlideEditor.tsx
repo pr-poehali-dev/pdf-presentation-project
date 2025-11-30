@@ -58,6 +58,17 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [targetBlockId, setTargetBlockId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const handleAddBlock = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: 'text' | 'image' | 'title' | 'subtitle' }>;
+      const lastBlockId = blocks[blocks.length - 1]?.id || '1';
+      addBlock(lastBlockId, customEvent.detail.type);
+    };
+    
+    document.addEventListener('addBlock', handleAddBlock);
+    return () => document.removeEventListener('addBlock', handleAddBlock);
+  }, [blocks]);
 
   const updateBlock = (id: string, content: string) => {
     const updatedBlocks = blocks.map(block =>
@@ -380,44 +391,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
           </div>
         )}
 
-        <div className="flex gap-2 mt-4 pt-4 border-t border-border/50 flex-wrap">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => addBlock(block.id, 'title')}
-            className="text-xs rounded-xl hover:bg-primary/10"
-          >
-            <Icon name="Heading1" size={14} className="mr-1" />
-            Заголовок
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => addBlock(block.id, 'subtitle')}
-            className="text-xs rounded-xl hover:bg-primary/10"
-          >
-            <Icon name="Heading2" size={14} className="mr-1" />
-            Подзаголовок
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => addBlock(block.id, 'text')}
-            className="text-xs rounded-xl hover:bg-primary/10"
-          >
-            <Icon name="Type" size={14} className="mr-1" />
-            Текст
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => addBlock(block.id, 'image')}
-            className="text-xs rounded-xl hover:bg-primary/10"
-          >
-            <Icon name="ImagePlus" size={14} className="mr-1" />
-            Фото
-          </Button>
-        </div>
+
       </div>
     );
   };

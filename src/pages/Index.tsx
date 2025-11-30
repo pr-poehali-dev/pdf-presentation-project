@@ -9,6 +9,7 @@ import jsPDF from 'jspdf';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
 import ThemeToggle from '@/components/ThemeToggle';
+import BackupManager from '@/components/BackupManager';
 
 interface Slide {
   id: number;
@@ -150,6 +151,16 @@ const Index = () => {
     setSettings({ ...settings, ...newSettings });
     toast.success('Настройки сохранены');
   };
+  
+  const handleRestore = (restoredSlides: Slide[], restoredSettings: AppSettings, restoredBackground: string) => {
+    setSlides(restoredSlides);
+    setSettings(restoredSettings);
+    setBackgroundImage(restoredBackground);
+    localStorage.setItem('slides', JSON.stringify(restoredSlides));
+    localStorage.setItem('settings', JSON.stringify(restoredSettings));
+    localStorage.setItem('backgroundImage', restoredBackground);
+    toast.success('Данные восстановлены');
+  };
 
   const handleExportPDF = async (slideIndices?: number[]) => {
     const loadingToast = toast.loading('Генерация PDF...');
@@ -215,7 +226,7 @@ const Index = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
         
         const canvas = await html2canvas(container, {
-          scale: 1.5,
+          scale: 2,
           useCORS: true,
           allowTaint: true,
           backgroundColor: null,
@@ -226,8 +237,10 @@ const Index = () => {
         
         document.body.removeChild(container);
         
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const imgWidth = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
         
         setCurrentSlide(tempSlide);
       }
@@ -304,18 +317,19 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen relative" style={{ background: backgroundImage ? 'transparent' : 'var(--background)' }}>
       {backgroundImage && (
         <div 
-          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat"
           style={{ 
             backgroundImage: `url(${backgroundImage})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            zIndex: 0
           }}
         />
       )}
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8" style={{ position: 'relative', zIndex: 1 }}>
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
             <div>
@@ -387,6 +401,12 @@ const Index = () => {
                     <Icon name="X" size={16} className="sm:w-[18px] sm:h-[18px]" />
                   </Button>
                 )}
+                <BackupManager
+                  slides={slides}
+                  settings={settings}
+                  backgroundImage={backgroundImage}
+                  onRestore={handleRestore}
+                />
                 <Button
                   variant="outline"
                   onClick={handleLogout}
@@ -413,7 +433,7 @@ const Index = () => {
               <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
                 Слайды
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 {slides.map((slide, index) => (
                   <button
                     key={slide.id}
@@ -429,6 +449,60 @@ const Index = () => {
                   </button>
                 ))}
               </div>
+              {isEditing && (
+                <div className="pt-4 border-t border-border/50">
+                  <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
+                    Добавить блок:
+                  </h4>
+                  <div className="space-y-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const lastBlockId = slides[currentSlide].id.toString();
+                        document.dispatchEvent(new CustomEvent('addBlock', { detail: { type: 'title' } }));
+                      }}
+                      className="w-full justify-start text-xs rounded-xl hover:bg-primary/10 hover:border-primary"
+                    >
+                      <Icon name="Heading1" size={14} className="mr-2" />
+                      Заголовок
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        document.dispatchEvent(new CustomEvent('addBlock', { detail: { type: 'subtitle' } }));
+                      }}
+                      className="w-full justify-start text-xs rounded-xl hover:bg-primary/10 hover:border-primary"
+                    >
+                      <Icon name="Heading2" size={14} className="mr-2" />
+                      Подзаголовок
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        document.dispatchEvent(new CustomEvent('addBlock', { detail: { type: 'text' } }));
+                      }}
+                      className="w-full justify-start text-xs rounded-xl hover:bg-primary/10 hover:border-primary"
+                    >
+                      <Icon name="Type" size={14} className="mr-2" />
+                      Текст
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        document.dispatchEvent(new CustomEvent('addBlock', { detail: { type: 'image' } }));
+                      }}
+                      className="w-full justify-start text-xs rounded-xl hover:bg-primary/10 hover:border-primary"
+                    >
+                      <Icon name="ImagePlus" size={14} className="mr-2" />
+                      Фото
+                    </Button>
+                  </div>
+                </div>
+              )}
             </Card>
           </div>
 

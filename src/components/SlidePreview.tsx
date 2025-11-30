@@ -32,14 +32,23 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
       </div>
     );
 
-    const imageBlock = image && (
-      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : 'flex-1 min-h-[150px] sm:min-h-[200px]'} overflow-hidden rounded-lg`}>
-        <img 
-          src={image} 
-          alt={title}
-          className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-          onClick={() => setIsImageOpen(true)}
-        />
+    const imageBlock = (
+      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : 'flex-1 min-h-[150px] sm:min-h-[200px]'} overflow-hidden rounded-lg ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center' : ''}`}>
+        {image ? (
+          <img 
+            src={image} 
+            alt={title}
+            className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => setIsImageOpen(true)}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 p-4 text-muted-foreground">
+            <svg className="w-12 h-12 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="text-xs opacity-50">Место для изображения</span>
+          </div>
+        )}
       </div>
     );
 
@@ -47,16 +56,22 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
       case 'center':
         return (
           <div className="relative h-full">
-            {image && (
-              <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden opacity-15">
+            <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden opacity-15">
+              {image ? (
                 <img 
                   src={image} 
                   alt={title}
                   className="w-full h-full object-cover cursor-pointer hover:opacity-25 transition-opacity"
                   onClick={() => setIsImageOpen(true)}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full border-2 border-dashed border-muted-foreground/10 bg-muted/10 flex items-center justify-center">
+                  <svg className="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
+            </div>
             <div className={`relative z-10 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'} flex flex-col justify-center h-full`}>
               {contentBlock}
             </div>
