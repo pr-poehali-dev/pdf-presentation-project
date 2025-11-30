@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import SlideEditor from '@/components/SlideEditor';
 
 interface Slide {
   id: number;
@@ -121,25 +119,13 @@ const Index = () => {
     }
   };
 
-  const handleUpdateSlide = (field: keyof Slide, value: string) => {
+  const handleUpdateSlide = (data: { title: string; subtitle: string; content: string; image: string }) => {
     const updatedSlides = [...slides];
     updatedSlides[currentSlide] = {
       ...updatedSlides[currentSlide],
-      [field]: value
+      ...data
     };
     setSlides(updatedSlides);
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        handleUpdateSlide('image', reader.result as string);
-        toast.success('Изображение обновлено');
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   return (
@@ -196,57 +182,66 @@ const Index = () => {
           </div>
 
           <div className="lg:col-span-9">
-            <Card className="overflow-hidden shadow-2xl">
-              <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
-                {!isEditing && slides[currentSlide].image && (
-                  <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
-                    <img 
-                      src={slides[currentSlide].image} 
-                      alt={slides[currentSlide].title}
-                      className="w-full h-full object-cover opacity-30"
-                    />
-                  </div>
-                )}
-                <div className="relative z-10 p-12 flex flex-col justify-center h-full">
-                  {isEditing ? (
-                    <div className="space-y-6">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Заголовок</label>
-                        <Input
-                          value={slides[currentSlide].title}
-                          onChange={(e) => handleUpdateSlide('title', e.target.value)}
-                          className="text-2xl font-bold h-auto py-3"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Подзаголовок</label>
-                        <Input
-                          value={slides[currentSlide].subtitle}
-                          onChange={(e) => handleUpdateSlide('subtitle', e.target.value)}
-                          className="h-auto py-2"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Содержание</label>
-                        <Textarea
-                          value={slides[currentSlide].content}
-                          onChange={(e) => handleUpdateSlide('content', e.target.value)}
-                          rows={8}
-                          className="resize-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Изображение</label>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="cursor-pointer"
-                        />
+            {isEditing ? (
+              <div className="grid grid-cols-2 gap-6">
+                <div className="max-h-[700px] overflow-y-auto pr-4">
+                  <h3 className="text-lg font-semibold mb-4">Редактор</h3>
+                  <SlideEditor
+                    title={slides[currentSlide].title}
+                    subtitle={slides[currentSlide].subtitle}
+                    content={slides[currentSlide].content}
+                    image={slides[currentSlide].image}
+                    onUpdate={handleUpdateSlide}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Превью</h3>
+                  <Card className="overflow-hidden shadow-2xl">
+                    <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
+                      {slides[currentSlide].image && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
+                          <img 
+                            src={slides[currentSlide].image} 
+                            alt={slides[currentSlide].title}
+                            className="w-full h-full object-cover opacity-30"
+                          />
+                        </div>
+                      )}
+                      <div className="relative z-10 p-8 flex flex-col justify-center h-full">
+                        <div className="max-w-md animate-fade-in">
+                          <div className="inline-block px-3 py-1 bg-secondary/20 rounded-full text-xs font-medium text-secondary mb-4">
+                            {slides[currentSlide].subtitle}
+                          </div>
+                          <h2 
+                            className="text-3xl font-bold text-primary mb-4 leading-tight"
+                            style={{ fontFamily: 'Montserrat, sans-serif' }}
+                          >
+                            {slides[currentSlide].title}
+                          </h2>
+                          <div 
+                            className="text-sm text-foreground/80 leading-relaxed"
+                            style={{ fontFamily: 'Open Sans, sans-serif' }}
+                            dangerouslySetInnerHTML={{ __html: slides[currentSlide].content }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  ) : (
+                  </Card>
+                </div>
+              </div>
+            ) : (
+              <Card className="overflow-hidden shadow-2xl">
+                <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
+                  {slides[currentSlide].image && (
+                    <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
+                      <img 
+                        src={slides[currentSlide].image} 
+                        alt={slides[currentSlide].title}
+                        className="w-full h-full object-cover opacity-30"
+                      />
+                    </div>
+                  )}
+                  <div className="relative z-10 p-12 flex flex-col justify-center h-full">
                     <div className="max-w-2xl animate-fade-in">
                       <div className="inline-block px-4 py-1.5 bg-secondary/20 rounded-full text-sm font-medium text-secondary mb-6">
                         {slides[currentSlide].subtitle}
@@ -258,16 +253,15 @@ const Index = () => {
                         {slides[currentSlide].title}
                       </h2>
                       <div 
-                        className="text-xl text-foreground/80 leading-relaxed whitespace-pre-line"
+                        className="text-xl text-foreground/80 leading-relaxed"
                         style={{ fontFamily: 'Open Sans, sans-serif' }}
-                      >
-                        {slides[currentSlide].content}
-                      </div>
+                        dangerouslySetInnerHTML={{ __html: slides[currentSlide].content }}
+                      />
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            )}
 
             <div className="flex justify-between items-center mt-6">
               <Button
