@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import pptxgen from 'pptxgenjs';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -178,8 +179,7 @@ const Index = () => {
     const loadingToast = toast.loading('Генерация PPTX...');
     
     try {
-      const PptxGenJS = (await import('pptxgenjs')).default;
-      const pptx = new PptxGenJS();
+      const pptx = new pptxgen();
       pptx.layout = 'LAYOUT_16x9';
       pptx.author = 'Презентация Усадьба Эрзи';
       pptx.company = 'Усадьба Эрзи';
