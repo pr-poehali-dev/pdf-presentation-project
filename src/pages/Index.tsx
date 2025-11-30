@@ -9,7 +9,7 @@ import jsPDF from 'jspdf';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
 import ThemeToggle from '@/components/ThemeToggle';
-import BackupManager from '@/components/BackupManager';
+
 
 interface Slide {
   id: number;
@@ -175,15 +175,7 @@ const Index = () => {
     toast.success('Настройки сохранены');
   };
   
-  const handleRestore = (restoredSlides: Slide[], restoredSettings: AppSettings, restoredBackground: string) => {
-    setSlides(restoredSlides);
-    setSettings(restoredSettings);
-    setBackgroundImage(restoredBackground);
-    localStorage.setItem('slides', JSON.stringify(restoredSlides));
-    localStorage.setItem('settings', JSON.stringify(restoredSettings));
-    localStorage.setItem('backgroundImage', restoredBackground);
-    toast.success('Данные восстановлены');
-  };
+
 
   const handleExportPDF = async (slideIndices?: number[]) => {
     const loadingToast = toast.loading('Генерация PDF...');
@@ -220,10 +212,9 @@ const Index = () => {
         container.style.flexDirection = 'column';
         if (slideBackground) {
           container.style.backgroundImage = `url(${slideBackground})`;
-          container.style.backgroundSize = 'contain';
+          container.style.backgroundSize = 'cover';
           container.style.backgroundPosition = 'center';
           container.style.backgroundRepeat = 'no-repeat';
-          container.style.backgroundColor = '#ffffff';
         } else {
           container.style.background = '#ffffff';
         }
@@ -658,11 +649,7 @@ const Index = () => {
                   </Button>
                 )}
               </div>
-              {!isEditing && (
-                <p className="text-sm sm:text-base text-muted-foreground" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  усадьбаэрьзи.рф
-                </p>
-              )}
+
             </div>
           </div>
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
@@ -694,12 +681,7 @@ const Index = () => {
                   <Icon name="Image" size={16} className="sm:w-[18px] sm:h-[18px]" />
                   <span className="hidden sm:inline">Фон</span>
                 </Button>
-                <BackupManager
-                  slides={slides}
-                  settings={settings}
-                  backgroundImage={backgroundImage}
-                  onRestore={handleRestore}
-                />
+
                 <Button
                   variant="outline"
                   onClick={handleLogout}
