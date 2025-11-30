@@ -204,12 +204,13 @@ const Index = () => {
         
         const container = document.createElement('div');
         container.style.width = '2560px';
-        container.style.minHeight = '1440px';
+        container.style.height = '1440px';
         container.style.position = 'fixed';
         container.style.left = '-9999px';
         container.style.top = '0';
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
+        container.style.overflow = 'hidden';
         if (slideBackground) {
           container.style.backgroundImage = `url(${slideBackground})`;
           container.style.backgroundSize = 'cover';
@@ -393,28 +394,23 @@ const Index = () => {
         
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        const actualHeight = Math.max(container.scrollHeight, 1440);
-        container.style.height = actualHeight + 'px';
-        container.style.minHeight = actualHeight + 'px';
-        
         const canvas = await html2canvas(container, {
           scale: 1.5,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: backgroundImage ? null : '#ffffff',
+          backgroundColor: slideBackground ? null : '#ffffff',
           logging: false,
           width: 2560,
-          height: actualHeight
+          height: 1440
         });
         
         document.body.removeChild(container);
         
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const imgWidth = 297;
-        const imgHeight = (actualHeight / 2560) * 297;
-        const finalHeight = Math.min(imgHeight, 210);
+        const imgHeight = 210;
         
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, finalHeight, undefined, 'FAST');
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
       }
 
       if (wasEditing) setIsEditing(true);
