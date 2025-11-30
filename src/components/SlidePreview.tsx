@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 
 interface SlidePreviewProps {
   title: string;
@@ -145,7 +145,10 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
       </div>
       
       <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
-        <DialogContent className="max-w-6xl p-0 bg-transparent border-none shadow-2xl" onClick={() => setIsImageOpen(false)}>
+        <DialogContent className="max-w-6xl p-0 bg-transparent border-none shadow-2xl" onClick={() => setIsImageOpen(false)} aria-describedby="image-preview">
+          <DialogDescription id="image-preview" className="sr-only">
+            Полноэкранный просмотр изображения слайда
+          </DialogDescription>
           <img 
             src={image} 
             alt={title}

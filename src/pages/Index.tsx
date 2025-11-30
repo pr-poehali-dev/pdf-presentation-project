@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -935,21 +935,6 @@ const Index = () => {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap');
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
       `}</style>
       
       <ThemeToggle />
@@ -968,6 +953,9 @@ const Index = () => {
         <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold">Экспорт презентации</DialogTitle>
+            <DialogDescription className="text-center">
+              Выберите режим экспорта презентации в PDF формат
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 pt-4">
             {exportMode === 'full' ? (
@@ -1063,6 +1051,9 @@ const Index = () => {
         <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold">Вход в режим редактирования</DialogTitle>
+            <DialogDescription className="text-center">
+              Введите логин и пароль для доступа к редактору презентации
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
@@ -1101,6 +1092,9 @@ const Index = () => {
         <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Настройки презентации</DialogTitle>
+            <DialogDescription>
+              Настройте логотип, заголовок и параметры доступа к презентации
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div>
@@ -1235,6 +1229,9 @@ const Index = () => {
         <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold">Выбор фона для слайда</DialogTitle>
+            <DialogDescription className="text-center">
+              Выберите слайд и загрузите изображение для фона
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <p className="text-sm text-muted-foreground text-center">Выберите слайд, для которого хотите установить фон</p>
