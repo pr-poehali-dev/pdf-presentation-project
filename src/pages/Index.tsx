@@ -5,6 +5,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import SlideEditor from '@/components/SlideEditor';
+import SlidePreview from '@/components/SlidePreview';
 
 interface Slide {
   id: number;
@@ -12,6 +13,7 @@ interface Slide {
   subtitle: string;
   content: string;
   image: string;
+  layout: 'center' | 'left' | 'right' | 'full';
 }
 
 const Index = () => {
@@ -20,31 +22,35 @@ const Index = () => {
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
-      title: 'Усадьба Эрьзи',
-      subtitle: 'Эко-поселок на берегу реки Яхрома',
+      title: 'Эко-поселок на берегу Яхромы',
+      subtitle: 'Усадьба скульптора Эрьзи',
       content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png'
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
+      layout: 'center'
     },
     {
       id: 2,
       title: 'Стратегия продвижения',
       subtitle: 'Целевые площадки и каналы',
       content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png'
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
+      layout: 'left'
     },
     {
       id: 3,
       title: 'Этапы реализации',
       subtitle: 'Пошаговый план действий',
       content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png'
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
+      layout: 'right'
     },
     {
       id: 4,
       title: 'Ожидаемые результаты',
       subtitle: 'Измеримые показатели роста',
       content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
-      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png'
+      image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
+      layout: 'left'
     }
   ]);
 
@@ -119,7 +125,7 @@ const Index = () => {
     }
   };
 
-  const handleUpdateSlide = (data: { title: string; subtitle: string; content: string; image: string }) => {
+  const handleUpdateSlide = (data: { title: string; subtitle: string; content: string; image: string; layout: 'center' | 'left' | 'right' | 'full' }) => {
     const updatedSlides = [...slides];
     updatedSlides[currentSlide] = {
       ...updatedSlides[currentSlide],
@@ -191,75 +197,34 @@ const Index = () => {
                     subtitle={slides[currentSlide].subtitle}
                     content={slides[currentSlide].content}
                     image={slides[currentSlide].image}
+                    layout={slides[currentSlide].layout}
                     onUpdate={handleUpdateSlide}
                   />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Превью</h3>
                   <Card className="overflow-hidden shadow-2xl">
-                    <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
-                      {slides[currentSlide].image && (
-                        <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
-                          <img 
-                            src={slides[currentSlide].image} 
-                            alt={slides[currentSlide].title}
-                            className="w-full h-full object-cover opacity-30"
-                          />
-                        </div>
-                      )}
-                      <div className="relative z-10 p-8 flex flex-col justify-center h-full">
-                        <div className="max-w-md animate-fade-in">
-                          <div className="inline-block px-3 py-1 bg-secondary/20 rounded-full text-xs font-medium text-secondary mb-4">
-                            {slides[currentSlide].subtitle}
-                          </div>
-                          <h2 
-                            className="text-3xl font-bold text-primary mb-4 leading-tight"
-                            style={{ fontFamily: 'Montserrat, sans-serif' }}
-                          >
-                            {slides[currentSlide].title}
-                          </h2>
-                          <div 
-                            className="text-sm text-foreground/80 leading-relaxed"
-                            style={{ fontFamily: 'Open Sans, sans-serif' }}
-                            dangerouslySetInnerHTML={{ __html: slides[currentSlide].content }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    <SlidePreview
+                      title={slides[currentSlide].title}
+                      subtitle={slides[currentSlide].subtitle}
+                      content={slides[currentSlide].content}
+                      image={slides[currentSlide].image}
+                      layout={slides[currentSlide].layout}
+                      fullSize={false}
+                    />
                   </Card>
                 </div>
               </div>
             ) : (
               <Card className="overflow-hidden shadow-2xl">
-                <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
-                  {slides[currentSlide].image && (
-                    <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
-                      <img 
-                        src={slides[currentSlide].image} 
-                        alt={slides[currentSlide].title}
-                        className="w-full h-full object-cover opacity-30"
-                      />
-                    </div>
-                  )}
-                  <div className="relative z-10 p-12 flex flex-col justify-center h-full">
-                    <div className="max-w-2xl animate-fade-in">
-                      <div className="inline-block px-4 py-1.5 bg-secondary/20 rounded-full text-sm font-medium text-secondary mb-6">
-                        {slides[currentSlide].subtitle}
-                      </div>
-                      <h2 
-                        className="text-5xl font-bold text-primary mb-8 leading-tight"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        {slides[currentSlide].title}
-                      </h2>
-                      <div 
-                        className="text-xl text-foreground/80 leading-relaxed"
-                        style={{ fontFamily: 'Open Sans, sans-serif' }}
-                        dangerouslySetInnerHTML={{ __html: slides[currentSlide].content }}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <SlidePreview
+                  title={slides[currentSlide].title}
+                  subtitle={slides[currentSlide].subtitle}
+                  content={slides[currentSlide].content}
+                  image={slides[currentSlide].image}
+                  layout={slides[currentSlide].layout}
+                  fullSize={true}
+                />
               </Card>
             )}
 

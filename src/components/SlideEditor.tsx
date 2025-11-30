@@ -17,10 +17,12 @@ interface SlideEditorProps {
   subtitle: string;
   content: string;
   image: string;
-  onUpdate: (data: { title: string; subtitle: string; content: string; image: string }) => void;
+  layout: 'center' | 'left' | 'right' | 'full';
+  onUpdate: (data: { title: string; subtitle: string; content: string; image: string; layout: 'center' | 'left' | 'right' | 'full' }) => void;
 }
 
-const SlideEditor = ({ title, subtitle, content, image, onUpdate }: SlideEditorProps) => {
+const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: SlideEditorProps) => {
+  const [currentLayout, setCurrentLayout] = useState<'center' | 'left' | 'right' | 'full'>(layout);
   const [blocks, setBlocks] = useState<Block[]>(() => {
     const initialBlocks: Block[] = [
       { id: '1', type: 'title', content: title },
@@ -104,7 +106,7 @@ const SlideEditor = ({ title, subtitle, content, image, onUpdate }: SlideEditorP
     }
   };
 
-  const notifyParent = (updatedBlocks: Block[]) => {
+  const notifyParent = (updatedBlocks: Block[], newLayout?: 'center' | 'left' | 'right' | 'full') => {
     const titleBlock = updatedBlocks.find(b => b.type === 'title');
     const subtitleBlock = updatedBlocks.find(b => b.type === 'subtitle');
     const imageBlock = updatedBlocks.find(b => b.type === 'image');
@@ -114,8 +116,14 @@ const SlideEditor = ({ title, subtitle, content, image, onUpdate }: SlideEditorP
       title: titleBlock?.content || '',
       subtitle: subtitleBlock?.content || '',
       content: textBlocks.map(b => b.content).join('\n\n'),
-      image: imageBlock?.content || ''
+      image: imageBlock?.content || '',
+      layout: newLayout || currentLayout
     });
+  };
+
+  const handleLayoutChange = (newLayout: 'center' | 'left' | 'right' | 'full') => {
+    setCurrentLayout(newLayout);
+    notifyParent(blocks, newLayout);
   };
 
   const renderBlock = (block: Block, index: number) => {
@@ -252,6 +260,70 @@ const SlideEditor = ({ title, subtitle, content, image, onUpdate }: SlideEditorP
 
   return (
     <div className="space-y-4">
+      <div className="mb-6 p-4 border border-border rounded-lg">
+        <label className="text-sm font-medium mb-3 block">Шаблон раскладки</label>
+        <div className="grid grid-cols-4 gap-2">
+          <button
+            onClick={() => handleLayoutChange('center')}
+            className={`p-3 border rounded-lg transition-all ${
+              currentLayout === 'center' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-border hover:border-primary/50'
+            }`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-full h-8 bg-muted rounded flex items-center justify-center">
+                <div className="w-3/4 h-1 bg-foreground/30 rounded" />
+              </div>
+              <span className="text-xs">Центр</span>
+            </div>
+          </button>
+          <button
+            onClick={() => handleLayoutChange('left')}
+            className={`p-3 border rounded-lg transition-all ${
+              currentLayout === 'left' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-border hover:border-primary/50'
+            }`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-full h-8 bg-muted rounded flex items-start justify-start p-1">
+                <div className="w-1/2 h-full bg-foreground/30 rounded" />
+              </div>
+              <span className="text-xs">Слева</span>
+            </div>
+          </button>
+          <button
+            onClick={() => handleLayoutChange('right')}
+            className={`p-3 border rounded-lg transition-all ${
+              currentLayout === 'right' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-border hover:border-primary/50'
+            }`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-full h-8 bg-muted rounded flex items-end justify-end p-1">
+                <div className="w-1/2 h-full bg-foreground/30 rounded" />
+              </div>
+              <span className="text-xs">Справа</span>
+            </div>
+          </button>
+          <button
+            onClick={() => handleLayoutChange('full')}
+            className={`p-3 border rounded-lg transition-all ${
+              currentLayout === 'full' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-border hover:border-primary/50'
+            }`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-full h-8 bg-foreground/30 rounded" />
+              <span className="text-xs">Полный</span>
+            </div>
+          </button>
+        </div>
+      </div>
+      
       <input
         ref={fileInputRef}
         type="file"
