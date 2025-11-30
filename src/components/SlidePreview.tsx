@@ -49,8 +49,9 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
           <img 
             src={image} 
             alt={title}
-            className={`w-full h-full ${layout === 'full' ? 'object-cover' : 'object-contain'} cursor-pointer hover:opacity-90 transition-opacity rounded-2xl`}
+            className={`w-full h-full ${layout === 'full' ? 'object-cover' : 'object-contain'} cursor-pointer hover:opacity-90 transition-opacity rounded-2xl animate-fade-in`}
             onClick={() => setIsImageOpen(true)}
+            key={image}
           />
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 p-4 text-muted-foreground">
@@ -72,8 +73,9 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
                 <img 
                   src={image} 
                   alt={title}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-25 transition-opacity"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-25 transition-opacity animate-fade-in"
                   onClick={() => setIsImageOpen(true)}
+                  key={image}
                 />
               ) : (
                 <div className="w-full h-full border-2 border-dashed border-muted-foreground/10 bg-muted/10 flex items-center justify-center">
