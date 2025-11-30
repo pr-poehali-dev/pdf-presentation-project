@@ -118,7 +118,13 @@ const Index = () => {
   
   useEffect(() => {
     if (backgroundImage) {
-      localStorage.setItem('backgroundImage', backgroundImage);
+      try {
+        localStorage.setItem('backgroundImage', backgroundImage);
+      } catch (error) {
+        console.error('Failed to save background to localStorage:', error);
+        toast.error('Не удалось сохранить фон. Изображение слишком большое.');
+        setBackgroundImage('');
+      }
     } else {
       localStorage.removeItem('backgroundImage');
     }
@@ -380,19 +386,63 @@ const Index = () => {
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      try {
+        const compressed = await compressBackgroundImage(file);
+        setBackgroundImage(compressed);
+        toast.success('Фоновое изображение установлено');
+      } catch (error) {
+        console.error('Background upload error:', error);
+        toast.error('Ошибка при загрузке фона. Попробуйте меньший размер изображения.');
+      }
+    }
+    if (e.target) e.target.value = '';
+  };
+  
+  const compressBackgroundImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onload = (e) => {
         const img = new Image();
+        img.onerror = () => reject(new Error('Failed to load image'));
         img.onload = () => {
-          setBackgroundImage(result);
-          toast.success('Фоновое изображение установлено');
+          const canvas = document.createElement('canvas');
+          const maxWidth = 1920;
+          const maxHeight = 1080;
+          let { width, height } = img;
+          
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width *= ratio;
+            height *= ratio;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          
+          if (compressed.length > 4 * 1024 * 1024) {
+            const evenMoreCompressed = canvas.toDataURL('image/jpeg', 0.6);
+            if (evenMoreCompressed.length > 4 * 1024 * 1024) {
+              reject(new Error('Image too large even after compression'));
+              return;
+            }
+            resolve(evenMoreCompressed);
+          } else {
+            resolve(compressed);
+          }
         };
-        img.src = result;
+        img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
   
   const getTitleShadow = () => {
