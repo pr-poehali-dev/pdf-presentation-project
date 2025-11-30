@@ -44,12 +44,12 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     );
 
     const imageBlock = (
-      <div className={`${layout === 'full' ? 'w-full h-56 sm:h-64 md:h-80 rounded-2xl' : fullSize ? 'flex-1 min-h-[250px] sm:min-h-[300px] rounded-2xl' : 'flex-1 min-h-[150px] sm:min-h-[200px] rounded-xl'} flex items-center justify-center overflow-hidden ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
+      <div className={`${layout === 'full' ? 'w-full h-56 sm:h-64 md:h-80' : fullSize ? 'flex-1 min-h-[250px] sm:min-h-[300px]' : 'flex-1 min-h-[150px] sm:min-h-[200px]'} rounded-2xl flex items-center justify-center overflow-hidden ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
         {image ? (
           <img 
             src={image} 
             alt={title}
-            className={`w-full h-full ${layout === 'full' ? 'object-cover' : 'object-contain'} cursor-pointer hover:opacity-90 transition-opacity`}
+            className={`w-full h-full ${layout === 'full' ? 'object-cover' : 'object-contain'} cursor-pointer hover:opacity-90 transition-opacity rounded-2xl`}
             onClick={() => setIsImageOpen(true)}
           />
         ) : (

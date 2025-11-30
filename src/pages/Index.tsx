@@ -880,7 +880,7 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <Card className={`overflow-hidden shadow-xl ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`} id={`slide-preview-${currentSlide}`}>
+              <Card className="overflow-hidden shadow-xl bg-background/60 backdrop-blur-xl border-background/20" id={`slide-preview-${currentSlide}`}>
                 <SlidePreview
                   key={`preview-${currentSlide}-${slides[currentSlide].id}`}
                   title={slides[currentSlide].title}
