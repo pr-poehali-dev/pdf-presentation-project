@@ -229,7 +229,7 @@ const Index = () => {
           logoEl.style.left = '40px';
           logoEl.style.height = 'auto';
           logoEl.style.width = 'auto';
-          logoEl.style.maxHeight = '120px';
+          logoEl.style.maxHeight = '240px';
           logoEl.style.maxWidth = '300px';
           logoEl.style.objectFit = 'contain';
           logoEl.style.zIndex = '10';
@@ -277,7 +277,7 @@ const Index = () => {
         subtitleEl.textContent = slide.subtitle;
         subtitleEl.style.display = 'inline-block';
         subtitleEl.style.padding = '14px 32px';
-        subtitleEl.style.background = 'rgba(0, 0, 0, 0.08)';
+        subtitleEl.style.background = 'rgba(128, 128, 128, 0.25)';
         subtitleEl.style.color = '#333333';
         subtitleEl.style.borderRadius = '999px';
         subtitleEl.style.fontSize = '28px';

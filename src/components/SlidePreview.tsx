@@ -26,7 +26,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
             />
           </div>
         )}
-        <div className={`inline-block ${fullSize ? 'px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm mb-4 sm:mb-6' : 'px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs mb-3 sm:mb-4'} bg-secondary/20 rounded-full font-medium text-secondary`}>
+        <div className={`inline-block ${fullSize ? 'px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm mb-4 sm:mb-6' : 'px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs mb-3 sm:mb-4'} bg-secondary/30 rounded-full font-medium text-secondary-foreground`}>
           {subtitle}
         </div>
         <h2 
@@ -44,12 +44,12 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     );
 
     const imageBlock = (
-      <div className={`${layout === 'full' ? 'w-full h-56 sm:h-64 md:h-80' : fullSize ? 'flex-1 min-h-[250px]' : 'flex-1 min-h-[150px]'} rounded-2xl flex items-center justify-center overflow-hidden ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
+      <div className={`${layout === 'full' ? 'w-full h-56 sm:h-64 md:h-80 rounded-2xl' : fullSize ? 'flex-1 min-h-[250px] sm:min-h-[300px] rounded-2xl' : 'flex-1 min-h-[150px] sm:min-h-[200px] rounded-xl'} flex items-center justify-center overflow-hidden ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20' : ''}`}>
         {image ? (
           <img 
             src={image} 
             alt={title}
-            className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity"
+            className={`w-full h-full ${layout === 'full' ? 'object-cover' : 'object-contain'} cursor-pointer hover:opacity-90 transition-opacity`}
             onClick={() => setIsImageOpen(true)}
           />
         ) : (
@@ -91,12 +91,12 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'left':
         return (
-          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
+          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 md:gap-8 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
             <div className={`${image ? 'flex-1' : 'flex-[2]'} w-full flex flex-col justify-center`}>
               {contentBlock}
             </div>
             {image && (
-              <div className="flex-1 w-full">
+              <div className="flex-1 w-full flex items-center">
                 {imageBlock}
               </div>
             )}
@@ -105,9 +105,9 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'right':
         return (
-          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
+          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 md:gap-8 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
             {image && (
-              <div className="flex-1 w-full">
+              <div className="flex-1 w-full flex items-center">
                 {imageBlock}
               </div>
             )}
@@ -121,13 +121,8 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
         return (
           <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-6 md:p-8 lg:p-10' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
             {image && (
-              <div className="w-full h-56 sm:h-64 md:h-80 rounded-2xl overflow-hidden flex-shrink-0">
-                <img 
-                  src={image} 
-                  alt={title}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => setIsImageOpen(true)}
-                />
+              <div className="w-full flex-shrink-0">
+                {imageBlock}
               </div>
             )}
             <div className="flex-shrink-0">
