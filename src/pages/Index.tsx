@@ -225,8 +225,11 @@ const Index = () => {
         contentDiv.style.gap = '60px';
         contentDiv.style.background = 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)';
         
+        const primaryColor = settings.mainTitleColor || 'hsl(119, 42%, 53%)';
+        const rgbPrimary = primaryColor.startsWith('hsl') ? 'rgb(89, 181, 96)' : primaryColor;
+        
         const textContainer = document.createElement('div');
-        textContainer.style.flex = '1';
+        textContainer.style.flex = slide.layout === 'left' || slide.layout === 'right' ? '1.2' : '1';
         textContainer.style.display = 'flex';
         textContainer.style.flexDirection = 'column';
         textContainer.style.justifyContent = 'center';
@@ -236,29 +239,31 @@ const Index = () => {
         subtitleEl.textContent = slide.subtitle;
         subtitleEl.style.display = 'inline-block';
         subtitleEl.style.padding = '12px 24px';
-        subtitleEl.style.background = 'rgba(139, 92, 246, 0.15)';
-        subtitleEl.style.color = '#8b5cf6';
+        subtitleEl.style.background = 'rgba(89, 181, 96, 0.15)';
+        subtitleEl.style.color = rgbPrimary;
         subtitleEl.style.borderRadius = '999px';
-        subtitleEl.style.fontSize = '24px';
+        subtitleEl.style.fontSize = '22px';
         subtitleEl.style.fontWeight = '500';
-        subtitleEl.style.marginBottom = '32px';
+        subtitleEl.style.marginBottom = '28px';
         subtitleEl.style.fontFamily = 'Montserrat, sans-serif';
+        subtitleEl.style.alignSelf = 'flex-start';
         
         const titleEl = document.createElement('h2');
         titleEl.textContent = slide.title;
-        titleEl.style.fontSize = '72px';
+        titleEl.style.fontSize = '64px';
         titleEl.style.fontWeight = '700';
-        titleEl.style.color = '#8b5cf6';
-        titleEl.style.marginBottom = '40px';
+        titleEl.style.color = rgbPrimary;
+        titleEl.style.marginBottom = '32px';
         titleEl.style.lineHeight = '1.2';
         titleEl.style.fontFamily = 'Montserrat, sans-serif';
         
         const contentEl = document.createElement('div');
         contentEl.innerHTML = slide.content;
-        contentEl.style.fontSize = '28px';
+        contentEl.style.fontSize = '24px';
         contentEl.style.lineHeight = '1.6';
         contentEl.style.color = '#333333';
         contentEl.style.fontFamily = 'Open Sans, sans-serif';
+        contentEl.style.maxWidth = '100%';
         
         textContainer.appendChild(subtitleEl);
         textContainer.appendChild(titleEl);
@@ -282,25 +287,37 @@ const Index = () => {
         } else if (slide.layout === 'left') {
           contentDiv.appendChild(textContainer);
           if (slide.image) {
+            const imageContainer = document.createElement('div');
+            imageContainer.style.flex = '0.8';
+            imageContainer.style.display = 'flex';
+            imageContainer.style.alignItems = 'center';
+            imageContainer.style.justifyContent = 'center';
+            
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
-            imageEl.style.flex = '1';
             imageEl.style.width = '100%';
-            imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'cover';
+            imageEl.style.maxHeight = '700px';
+            imageEl.style.objectFit = 'contain';
             imageEl.style.borderRadius = '16px';
-            contentDiv.appendChild(imageEl);
+            imageContainer.appendChild(imageEl);
+            contentDiv.appendChild(imageContainer);
           }
         } else if (slide.layout === 'right') {
           if (slide.image) {
+            const imageContainer = document.createElement('div');
+            imageContainer.style.flex = '0.8';
+            imageContainer.style.display = 'flex';
+            imageContainer.style.alignItems = 'center';
+            imageContainer.style.justifyContent = 'center';
+            
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
-            imageEl.style.flex = '1';
             imageEl.style.width = '100%';
-            imageEl.style.height = '100%';
-            imageEl.style.objectFit = 'cover';
+            imageEl.style.maxHeight = '700px';
+            imageEl.style.objectFit = 'contain';
             imageEl.style.borderRadius = '16px';
-            contentDiv.appendChild(imageEl);
+            imageContainer.appendChild(imageEl);
+            contentDiv.appendChild(imageContainer);
           }
           contentDiv.appendChild(textContainer);
         } else if (slide.layout === 'full') {
@@ -308,8 +325,8 @@ const Index = () => {
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
             imageEl.style.width = '100%';
-            imageEl.style.height = '400px';
-            imageEl.style.objectFit = 'cover';
+            imageEl.style.maxHeight = '500px';
+            imageEl.style.objectFit = 'contain';
             imageEl.style.borderRadius = '16px';
             imageEl.style.marginBottom = '40px';
             contentDiv.insertBefore(imageEl, textContainer);
