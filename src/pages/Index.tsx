@@ -244,29 +244,29 @@ const Index = () => {
         const subtitleEl = document.createElement('div');
         subtitleEl.textContent = slide.subtitle;
         subtitleEl.style.display = 'inline-block';
-        subtitleEl.style.padding = '8px 20px';
+        subtitleEl.style.padding = '14px 32px';
         subtitleEl.style.background = 'rgba(0, 0, 0, 0.08)';
         subtitleEl.style.color = '#333333';
         subtitleEl.style.borderRadius = '999px';
-        subtitleEl.style.fontSize = '20px';
+        subtitleEl.style.fontSize = '28px';
         subtitleEl.style.fontWeight = '400';
-        subtitleEl.style.marginBottom = '24px';
+        subtitleEl.style.marginBottom = '32px';
         subtitleEl.style.fontFamily = 'Open Sans, sans-serif';
         subtitleEl.style.alignSelf = 'flex-start';
         
         const titleEl = document.createElement('h2');
         titleEl.textContent = slide.title;
-        titleEl.style.fontSize = '72px';
+        titleEl.style.fontSize = '96px';
         titleEl.style.fontWeight = '700';
         titleEl.style.color = rgbPrimary;
-        titleEl.style.marginBottom = '28px';
+        titleEl.style.marginBottom = '40px';
         titleEl.style.lineHeight = '1.15';
         titleEl.style.fontFamily = 'Montserrat, sans-serif';
         titleEl.style.letterSpacing = '-0.02em';
         
         const contentEl = document.createElement('div');
         contentEl.innerHTML = slide.content;
-        contentEl.style.fontSize = '20px';
+        contentEl.style.fontSize = '28px';
         contentEl.style.lineHeight = '1.7';
         contentEl.style.color = '#333333';
         contentEl.style.fontFamily = 'Open Sans, sans-serif';
