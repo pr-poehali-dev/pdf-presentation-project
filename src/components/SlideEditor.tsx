@@ -100,6 +100,26 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     notifyParent(updatedBlocks);
   };
 
+  const duplicateBlock = (id: string) => {
+    const index = blocks.findIndex(b => b.id === id);
+    const blockToCopy = blocks[index];
+    
+    const newBlock: Block = {
+      id: Date.now().toString(),
+      type: blockToCopy.type,
+      content: blockToCopy.content
+    };
+    
+    const updatedBlocks = [
+      ...blocks.slice(0, index + 1),
+      newBlock,
+      ...blocks.slice(index + 1)
+    ];
+    setBlocks(updatedBlocks);
+    notifyParent(updatedBlocks);
+    toast.success('Блок скопирован');
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && targetBlockId) {
@@ -143,6 +163,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             className="h-7 w-7 p-0"
             onClick={() => moveBlock(block.id, 'up')}
             disabled={index === 0}
+            title="Переместить вверх"
           >
             <Icon name="ChevronUp" size={14} />
           </Button>
@@ -152,14 +173,25 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
             className="h-7 w-7 p-0"
             onClick={() => moveBlock(block.id, 'down')}
             disabled={index === blocks.length - 1}
+            title="Переместить вниз"
           >
             <Icon name="ChevronDown" size={14} />
+          </Button>
+          <Button
+            size="sm"
+            variant="default"
+            className="h-7 w-7 p-0"
+            onClick={() => duplicateBlock(block.id)}
+            title="Копировать блок"
+          >
+            <Icon name="Copy" size={14} />
           </Button>
           <Button
             size="sm"
             variant="destructive"
             className="h-7 w-7 p-0"
             onClick={() => deleteBlock(block.id)}
+            title="Удалить блок"
           >
             <Icon name="Trash2" size={14} />
           </Button>
