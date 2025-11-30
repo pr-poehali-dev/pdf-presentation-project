@@ -179,4 +179,28 @@
     background: hsl(var(--card)) !important;
     border-color: hsl(var(--border)) !important;
   }
+
+  .slide-title {
+    font-family: Montserrat, sans-serif;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+    color: hsl(var(--primary));
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .slide-subtitle {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    background: hsl(var(--secondary) / 0.3);
+    border-radius: 9999px;
+    font-weight: 500;
+    color: hsl(var(--secondary-foreground));
+    margin-bottom: 1.5rem;
+  }
+
+  .slide-text {
+    margin-bottom: 1rem;
+  }
 }

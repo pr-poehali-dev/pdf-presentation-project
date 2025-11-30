@@ -59,10 +59,12 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
       initialBlocks.push({ id: String(blockIdCounter++), type: 'text', content: content || 'Текст' });
     } else {
       children.forEach((child) => {
-        if (child.tagName === 'H2') {
+        const blockType = (child as HTMLElement).getAttribute('data-block-type');
+        
+        if (blockType === 'title' || child.tagName === 'H2' || (child as HTMLElement).classList.contains('slide-title')) {
           initialBlocks.push({ id: String(blockIdCounter++), type: 'title', content: child.textContent || '' });
-        } else if (child.tagName === 'DIV' && child.className === '' && child.textContent && child.textContent.length < 100 && child.getAttribute('style')?.includes('border-radius: 9999px')) {
-          initialBlocks.push({ id: String(blockIdCounter++), type: 'subtitle', content: child.textContent });
+        } else if (blockType === 'subtitle' || (child as HTMLElement).classList.contains('slide-subtitle') || (child.tagName === 'DIV' && child.getAttribute('style')?.includes('border-radius: 9999px'))) {
+          initialBlocks.push({ id: String(blockIdCounter++), type: 'subtitle', content: child.textContent || '' });
         } else {
           initialBlocks.push({ id: String(blockIdCounter++), type: 'text', content: child.innerHTML });
         }
@@ -231,11 +233,11 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     const contentParts: string[] = [];
     updatedBlocks.forEach(block => {
       if (block.type === 'title') {
-        contentParts.push(`<h2 style="font-family: Montserrat, sans-serif; font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1.5rem; line-height: 1.2;">${block.content}</h2>`);
+        contentParts.push(`<h2 class="slide-title" data-block-type="title">${block.content}</h2>`);
       } else if (block.type === 'subtitle') {
-        contentParts.push(`<div style="display: inline-block; padding: 0.5rem 1rem; font-size: 0.875rem; background: hsl(var(--secondary) / 0.3); border-radius: 9999px; font-weight: 500; color: hsl(var(--secondary-foreground)); margin-bottom: 1.5rem;">${block.content}</div>`);
+        contentParts.push(`<div class="slide-subtitle" data-block-type="subtitle">${block.content}</div>`);
       } else if (block.type === 'text') {
-        contentParts.push(`<div style="margin-bottom: 1rem;">${block.content}</div>`);
+        contentParts.push(`<div class="slide-text" data-block-type="text">${block.content}</div>`);
       }
     });
 
