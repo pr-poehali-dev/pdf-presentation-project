@@ -221,13 +221,29 @@ const Index = () => {
         }
         document.body.appendChild(container);
         
+        if (settings.logo && slide.showLogo) {
+          const logoEl = document.createElement('img');
+          logoEl.src = settings.logo;
+          logoEl.style.position = 'absolute';
+          logoEl.style.top = '40px';
+          logoEl.style.left = '40px';
+          logoEl.style.height = 'auto';
+          logoEl.style.width = 'auto';
+          logoEl.style.maxHeight = '120px';
+          logoEl.style.maxWidth = '300px';
+          logoEl.style.objectFit = 'contain';
+          logoEl.style.zIndex = '10';
+          container.appendChild(logoEl);
+        }
+        
         const tempDiv = document.createElement('div');
         tempDiv.style.width = '100%';
-        tempDiv.style.minHeight = '100%';
-        tempDiv.style.padding = '40px';
+        tempDiv.style.height = '100%';
+        tempDiv.style.padding = '60px 40px 40px 40px';
         tempDiv.style.display = 'flex';
-        tempDiv.style.alignItems = 'center';
+        tempDiv.style.alignItems = 'flex-start';
         tempDiv.style.justifyContent = 'center';
+        tempDiv.style.paddingTop = '180px';
         
         const cardWrapper = document.createElement('div');
         cardWrapper.style.width = '100%';
@@ -256,19 +272,6 @@ const Index = () => {
         textContainer.style.flexDirection = 'column';
         textContainer.style.justifyContent = 'center';
         textContainer.style.maxWidth = slide.layout === 'center' ? '900px' : 'none';
-        
-        if (settings.logo && slide.showLogo) {
-          const logoEl = document.createElement('img');
-          logoEl.src = settings.logo;
-          logoEl.style.height = 'auto';
-          logoEl.style.width = 'auto';
-          logoEl.style.maxHeight = '210px';
-          logoEl.style.maxWidth = '400px';
-          logoEl.style.objectFit = 'contain';
-          logoEl.style.marginBottom = '32px';
-          logoEl.style.alignSelf = 'flex-start';
-          textContainer.appendChild(logoEl);
-        }
         
         const subtitleEl = document.createElement('div');
         subtitleEl.textContent = slide.subtitle;
