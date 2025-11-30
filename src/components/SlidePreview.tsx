@@ -108,13 +108,13 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col">
             {image && (
-              <div className={`w-full ${fullSize ? 'h-64 sm:h-80 md:h-96' : 'h-48 sm:h-56 md:h-64'} rounded-t-2xl overflow-hidden flex-shrink-0`}>
+              <div className="w-full rounded-t-2xl overflow-hidden flex-shrink-0">
                 <img 
                   src={image} 
                   alt={title}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => setIsImageOpen(true)}
                 />
               </div>
