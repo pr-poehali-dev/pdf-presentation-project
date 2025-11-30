@@ -28,6 +28,7 @@ interface Block {
   type: 'text' | 'image' | 'title' | 'subtitle';
   content: string;
   originalImage?: string;
+  color?: string;
 }
 
 interface SlideEditorProps {
@@ -62,7 +63,8 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
         const blockType = (child as HTMLElement).getAttribute('data-block-type');
         
         if (blockType === 'title' || child.tagName === 'H2' || (child as HTMLElement).classList.contains('slide-title')) {
-          initialBlocks.push({ id: String(blockIdCounter++), type: 'title', content: child.textContent || '' });
+          const color = (child as HTMLElement).getAttribute('data-color') || '';
+          initialBlocks.push({ id: String(blockIdCounter++), type: 'title', content: child.textContent || '', color });
         } else if (blockType === 'subtitle' || (child as HTMLElement).classList.contains('slide-subtitle') || (child.tagName === 'DIV' && child.getAttribute('style')?.includes('border-radius: 9999px'))) {
           initialBlocks.push({ id: String(blockIdCounter++), type: 'subtitle', content: child.textContent || '' });
         } else {
@@ -92,9 +94,9 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     return () => document.removeEventListener('addBlock', handleAddBlock);
   }, [blocks]);
 
-  const updateBlock = (id: string, content: string) => {
+  const updateBlock = (id: string, content: string, color?: string) => {
     const updatedBlocks = blocks.map(block =>
-      block.id === id ? { ...block, content } : block
+      block.id === id ? { ...block, content, ...(color !== undefined && { color }) } : block
     );
     setBlocks(updatedBlocks);
     notifyParent(updatedBlocks);
@@ -233,7 +235,8 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
     const contentParts: string[] = [];
     updatedBlocks.forEach(block => {
       if (block.type === 'title') {
-        contentParts.push(`<h2 class="slide-title" data-block-type="title">${block.content}</h2>`);
+        const style = block.color ? ` style="color: ${block.color};"` : '';
+        contentParts.push(`<h2 class="slide-title" data-block-type="title" data-color="${block.color || ''}"${style}>${block.content}</h2>`);
       } else if (block.type === 'subtitle') {
         contentParts.push(`<div class="slide-subtitle" data-block-type="subtitle">${block.content}</div>`);
       } else if (block.type === 'text') {
@@ -351,14 +354,44 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
         </div>
 
         {block.type === 'title' && (
-          <div>
-            <label className="text-xs font-medium text-foreground/70 mb-1 block">Заголовок</label>
-            <Input
-              value={block.content}
-              onChange={(e) => updateBlock(block.id, e.target.value)}
-              className="text-xl sm:text-2xl font-bold h-auto py-3 bg-background text-foreground rounded-xl border-2 focus:border-primary transition-all"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
-            />
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-medium text-foreground/70 mb-1 block">Заголовок</label>
+              <Input
+                value={block.content}
+                onChange={(e) => updateBlock(block.id, e.target.value, block.color)}
+                className="text-xl sm:text-2xl font-bold h-auto py-3 bg-background text-foreground rounded-xl border-2 focus:border-primary transition-all"
+                style={{ fontFamily: 'Montserrat, sans-serif', color: block.color || 'hsl(var(--primary))' }}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-foreground/70 mb-1 block">Цвет заголовка</label>
+              <div className="flex gap-2">
+                <input
+                  type="color"
+                  value={block.color || '#64b362'}
+                  onChange={(e) => updateBlock(block.id, block.content, e.target.value)}
+                  className="w-16 h-10 rounded-xl border-2 border-border cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={block.color || ''}
+                  onChange={(e) => updateBlock(block.id, block.content, e.target.value)}
+                  placeholder="Например: #64b362"
+                  className="flex-1 rounded-xl"
+                />
+                {block.color && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateBlock(block.id, block.content, '')}
+                    className="rounded-xl"
+                  >
+                    Сброс
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -383,6 +416,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
               modules={{
                 toolbar: [
                   ['bold', 'italic', 'underline'],
+                  [{ size: ['small', false, 'large', 'huge'] }],
                   [{ list: 'ordered' }, { list: 'bullet' }],
                   [{ color: [] }, { background: [] }],
                   ['clean']

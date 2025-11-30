@@ -182,7 +182,7 @@
 
   .slide-title {
     font-family: Montserrat, sans-serif;
-    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-size: clamp(1.25rem, 3.5vw, 2.25rem);
     font-weight: 700;
     color: hsl(var(--primary));
     margin-bottom: 1.5rem;

@@ -341,7 +341,7 @@ const Index = () => {
           if (slide.image) {
             const imageContainer = document.createElement('div');
             imageContainer.style.width = '100%';
-            imageContainer.style.height = '700px';
+            imageContainer.style.height = '900px';
             imageContainer.style.borderRadius = '24px 24px 0 0';
             imageContainer.style.overflow = 'hidden';
             imageContainer.style.flexShrink = '0';
@@ -351,6 +351,7 @@ const Index = () => {
             imageEl.style.width = '100%';
             imageEl.style.height = '100%';
             imageEl.style.objectFit = 'cover';
+            imageEl.style.objectPosition = 'center';
             imageContainer.appendChild(imageEl);
             contentDiv.appendChild(imageContainer);
           }
