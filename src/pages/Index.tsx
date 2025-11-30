@@ -20,6 +20,7 @@ interface Slide {
   layout: 'center' | 'left' | 'right' | 'full';
   background?: string;
   showLogo?: boolean;
+  name?: string;
 }
 
 interface AppSettings {
@@ -30,6 +31,7 @@ interface AppSettings {
   adminLogin: string;
   adminPassword: string;
   logo: string;
+  slidesBlockTitle: string;
 }
 
 const Index = () => {
@@ -49,7 +51,8 @@ const Index = () => {
     mainTitleShadowIntensity: 2,
     adminLogin: 'Admin',
     adminPassword: 'admin1234',
-    logo: ''
+    logo: '',
+    slidesBlockTitle: 'Слайды'
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -63,7 +66,8 @@ const Index = () => {
       content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
       layout: 'center',
-      showLogo: true
+      showLogo: true,
+      name: 'Слайд 1'
     },
     {
       id: 2,
@@ -72,7 +76,8 @@ const Index = () => {
       content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
       layout: 'left',
-      showLogo: false
+      showLogo: false,
+      name: 'Слайд 2'
     },
     {
       id: 3,
@@ -81,7 +86,8 @@ const Index = () => {
       content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
       layout: 'right',
-      showLogo: false
+      showLogo: false,
+      name: 'Слайд 3'
     },
     {
       id: 4,
@@ -90,7 +96,8 @@ const Index = () => {
       content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
       layout: 'left',
-      showLogo: false
+      showLogo: false,
+      name: 'Слайд 4'
     }
   ]);
 
@@ -446,6 +453,12 @@ const Index = () => {
     setSlides(updatedSlides);
     toast.success(updatedSlides[slideIndex].showLogo ? 'Логотип включен' : 'Логотип выключен');
   };
+  
+  const handleUpdateSlideName = (slideIndex: number, newName: string) => {
+    const updatedSlides = [...slides];
+    updatedSlides[slideIndex].name = newName;
+    setSlides(updatedSlides);
+  };
 
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -486,7 +499,8 @@ const Index = () => {
       image: '',
       layout: 'center',
       background: '',
-      showLogo: false
+      showLogo: false,
+      name: `Слайд ${slides.length + 1}`
     };
     setSlides([...slides, newSlide]);
     setCurrentSlide(slides.length);
@@ -644,9 +658,11 @@ const Index = () => {
                   </Button>
                 )}
               </div>
-              <p className="text-sm sm:text-base text-muted-foreground" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                усадьбаэрьзи.рф
-              </p>
+              {!isEditing && (
+                <p className="text-sm sm:text-base text-muted-foreground" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  усадьбаэрьзи.рф
+                </p>
+              )}
             </div>
           </div>
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
@@ -700,9 +716,19 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
             <Card className={`p-3 sm:p-4 shadow-lg ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
-              <h3 className="font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
-                Слайды
-              </h3>
+              <div className="flex items-center gap-2 mb-4">
+                {isEditing ? (
+                  <Input
+                    value={settings.slidesBlockTitle}
+                    onChange={(e) => handleUpdateSettings({ slidesBlockTitle: e.target.value })}
+                    className="font-semibold text-sm uppercase tracking-wide h-8 px-2"
+                  />
+                ) : (
+                  <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                    {settings.slidesBlockTitle}
+                  </h3>
+                )}
+              </div>
               <div className="space-y-3 mb-6">
                 {slides.map((slide, index) => (
                   <div key={slide.id} className="relative group">
@@ -715,7 +741,16 @@ const Index = () => {
                       }`}
                     >
                       <div className="text-xs font-semibold mb-1 flex items-center justify-between">
-                        <span>Слайд {index + 1}</span>
+                        {isEditing ? (
+                          <Input
+                            value={slide.name || `Слайд ${index + 1}`}
+                            onChange={(e) => handleUpdateSlideName(index, e.target.value)}
+                            className="h-5 px-1 text-xs font-semibold py-0 min-w-0"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <span>{slide.name || `Слайд ${index + 1}`}</span>
+                        )}
                         <div className="flex items-center gap-1">
                           {slide.background && (
                             <Icon name="Image" size={12} className="opacity-60" />
@@ -1013,11 +1048,11 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-semibold mb-1">Слайд {index + 1}</div>
+                        <div className="text-sm font-semibold mb-1">{slide.name || `Слайд ${index + 1}`}</div>
                         <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
                       </div>
                     </div>
-                  ))}
+                  ))}  
                 </div>
                 <div className="flex gap-3 pt-4 border-t">
                   <Button
@@ -1229,7 +1264,7 @@ const Index = () => {
                   className="flex items-center gap-4 p-4 border-2 rounded-xl transition-all hover:shadow-md bg-card border-border hover:border-primary/50"
                 >
                   <div className="flex-1">
-                    <div className="text-sm font-semibold mb-1">Слайд {index + 1}</div>
+                    <div className="text-sm font-semibold mb-1">{slide.name || `Слайд ${index + 1}`}</div>
                     <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
                     {slide.background && (
                       <div className="text-xs text-primary mt-1 flex items-center gap-1">
