@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import PptxGenJS from 'pptxgenjs';
 import SlideEditor from '@/components/SlideEditor';
 import SlidePreview from '@/components/SlidePreview';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -54,6 +55,9 @@ const Index = () => {
     slidesBlockTitle: 'Слайды'
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportMode, setExportMode] = useState<'full' | 'selective'>('full');
+  const [selectedSlides, setSelectedSlides] = useState<number[]>([]);
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
@@ -169,6 +173,140 @@ const Index = () => {
   const handleUpdateSettings = (newSettings: Partial<AppSettings>) => {
     setSettings({ ...settings, ...newSettings });
     toast.success('Настройки сохранены');
+  };
+
+  const handleExportPPTX = async (slideIndices?: number[]) => {
+    const loadingToast = toast.loading('Генерация PPTX...');
+    
+    try {
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_16x9';
+      pptx.author = 'Презентация Усадьба Эрзи';
+      pptx.company = 'Усадьба Эрзи';
+      pptx.title = settings.mainTitle;
+
+      const slidesToExport = slideIndices || slides.map((_, idx) => idx);
+      
+      for (const i of slidesToExport) {
+        const slideData = slides[i];
+        const pptxSlide = pptx.addSlide();
+        
+        if (slideData.background || backgroundImage) {
+          pptxSlide.background = { 
+            path: slideData.background || backgroundImage 
+          };
+        }
+        
+        if (slideData.showLogo && settings.logo) {
+          pptxSlide.addImage({
+            path: settings.logo,
+            x: 0.5,
+            y: 0.5,
+            w: 1.5,
+            h: 0.8
+          });
+        }
+        
+        const titleY = slideData.layout === 'center' ? 2.0 : 1.0;
+        
+        if (slideData.title) {
+          pptxSlide.addText(slideData.title, {
+            x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
+            y: titleY,
+            w: slideData.layout === 'center' ? 7 : 5,
+            h: 1.0,
+            fontSize: 36,
+            bold: true,
+            color: '000000',
+            align: slideData.layout === 'center' ? 'center' : 'left',
+            fontFace: 'Arial'
+          });
+        }
+        
+        if (slideData.subtitle) {
+          pptxSlide.addText(slideData.subtitle, {
+            x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
+            y: titleY + 1.2,
+            w: slideData.layout === 'center' ? 7 : 5,
+            h: 0.8,
+            fontSize: 24,
+            color: '666666',
+            align: slideData.layout === 'center' ? 'center' : 'left',
+            fontFace: 'Arial'
+          });
+        }
+        
+        if (slideData.content) {
+          const contentHtml = slideData.content
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .trim();
+          
+          if (contentHtml) {
+            pptxSlide.addText(contentHtml, {
+              x: slideData.layout === 'right' ? 0.5 : slideData.layout === 'left' ? 4.5 : 1.5,
+              y: titleY + 2.2,
+              w: slideData.layout === 'center' ? 7 : 5,
+              h: 2.0,
+              fontSize: 16,
+              color: '333333',
+              align: slideData.layout === 'center' ? 'center' : 'left',
+              fontFace: 'Arial',
+              valign: 'top'
+            });
+          }
+        }
+        
+        if (slideData.image) {
+          const imgX = slideData.layout === 'left' ? 0.5 : slideData.layout === 'right' ? 5.5 : 3.0;
+          const imgY = slideData.layout === 'center' ? 4.5 : 1.5;
+          const imgW = slideData.layout === 'center' ? 4.0 : 3.5;
+          const imgH = slideData.layout === 'center' ? 2.5 : 3.0;
+          
+          pptxSlide.addImage({
+            path: slideData.image,
+            x: imgX,
+            y: imgY,
+            w: imgW,
+            h: imgH
+          });
+        }
+      }
+
+      await pptx.writeFile({ fileName: 'presentation-usadba-erzi.pptx' });
+      toast.success('PPTX успешно экспортирован!', { id: loadingToast });
+      setShowExportDialog(false);
+      setSelectedSlides([]);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Ошибка при экспорте PPTX', { id: loadingToast });
+    }
+  };
+
+  const handleExportClick = () => {
+    setShowExportDialog(true);
+    setSelectedSlides(slides.map((_, idx) => idx));
+  };
+  
+  const handleFullExport = () => {
+    setShowExportDialog(false);
+    handleExportPPTX();
+  };
+  
+  const handleSelectiveExport = () => {
+    if (selectedSlides.length === 0) {
+      toast.error('Выберите хотя бы один слайд');
+      return;
+    }
+    handleExportPPTX(selectedSlides);
+  };
+  
+  const toggleSlideSelection = (index: number) => {
+    if (selectedSlides.includes(index)) {
+      setSelectedSlides(selectedSlides.filter(i => i !== index));
+    } else {
+      setSelectedSlides([...selectedSlides, index].sort((a, b) => a - b));
+    }
   };
 
   const handleUpdateSlide = (data: { title: string; subtitle: string; content: string; image: string; layout: 'center' | 'left' | 'right' | 'full' }) => {
@@ -389,6 +527,11 @@ const Index = () => {
                 </Button>
               </>
             )}
+            <Button onClick={handleExportClick} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
+              <Icon name="Download" size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Экспорт PPTX</span>
+              <span className="sm:hidden">PPTX</span>
+            </Button>
             {isAuthenticated && (
               <>
                 <Button
@@ -663,6 +806,104 @@ const Index = () => {
           Разработчику
         </Button>
       )}
+      
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">Экспорт презентации</DialogTitle>
+            <DialogDescription className="text-center">
+              Выберите режим экспорта презентации в PowerPoint формат
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            {exportMode === 'full' ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={handleFullExport}
+                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-primary bg-primary/10 shadow-lg"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <Icon name="FileDown" size={32} />
+                      <div className="text-lg font-bold">Полный</div>
+                      <div className="text-sm text-muted-foreground">Экспорт всей презентации</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setExportMode('selective')}
+                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-border bg-card hover:border-primary/50 hover:shadow-md"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <Icon name="ListChecks" size={32} />
+                      <div className="text-lg font-bold">Выборочный</div>
+                      <div className="text-sm text-muted-foreground">Выберите страницы для экспорта</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Выберите слайды для экспорта</h3>
+                  <Button variant="ghost" onClick={() => setExportMode('full')} size="sm">
+                    <Icon name="ArrowLeft" size={16} className="mr-2" />
+                    Назад
+                  </Button>
+                </div>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                  {slides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      onClick={() => toggleSlideSelection(index)}
+                      className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
+                        selectedSlides.includes(index)
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-card hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex-shrink-0">
+                        <div
+                          className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                            selectedSlides.includes(index)
+                              ? 'border-primary bg-primary'
+                              : 'border-muted-foreground/30'
+                          }`}
+                        >
+                          {selectedSlides.includes(index) && (
+                            <Icon name="Check" size={16} className="text-primary-foreground" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold mb-1">{slide.name || `Слайд ${index + 1}`}</div>
+                        <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
+                      </div>
+                    </div>
+                  ))}  
+                </div>
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      if (selectedSlides.length === slides.length) {
+                        setSelectedSlides([]);
+                      } else {
+                        setSelectedSlides(slides.map((_, idx) => idx));
+                      }
+                    }}
+                    className="flex-1"
+                  >
+                    {selectedSlides.length === slides.length ? 'Снять все' : 'Выбрать все'}
+                  </Button>
+                  <Button onClick={handleSelectiveExport} className="flex-1">
+                    Экспортировать ({selectedSlides.length})
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
