@@ -19,6 +19,7 @@ interface Slide {
   image: string;
   layout: 'center' | 'left' | 'right' | 'full';
   background?: string;
+  showLogo?: boolean;
 }
 
 interface AppSettings {
@@ -61,7 +62,8 @@ const Index = () => {
       subtitle: 'Усадьба скульптора Эрьзи',
       content: 'Комплексная стратегия продвижения эко-поселка "Усадьба скульптора Эрьзи" — загородного курорта премиум-класса с уникальной инфраструктурой и природной атмосферой.',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/18.png',
-      layout: 'center'
+      layout: 'center',
+      showLogo: true
     },
     {
       id: 2,
@@ -69,7 +71,8 @@ const Index = () => {
       subtitle: 'Целевые площадки и каналы',
       content: '• Яндекс.Карты — геолокация и навигация для гостей\n• Instagram — визуальный контент природы и активностей\n• ВКонтакте — комьюнити любителей экотуризма\n• Сайты бронирования — Booking, Ostrovok\n• Партнерство с горнолыжными курортами (Сорочаны, Тягачево)',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/14.png',
-      layout: 'left'
+      layout: 'left',
+      showLogo: false
     },
     {
       id: 3,
@@ -77,7 +80,8 @@ const Index = () => {
       subtitle: 'Пошаговый план действий',
       content: '1. Аудит присутствия и конкурентов (неделя 1-2)\n2. Разработка контент-стратегии с акцентом на природу (неделя 2-3)\n3. Оптимизация профилей и SEO (неделя 3-4)\n4. Запуск таргетированной рекламы (неделя 5)\n5. Развитие партнерской сети с курортами (постоянно)',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/16.png',
-      layout: 'right'
+      layout: 'right',
+      showLogo: false
     },
     {
       id: 4,
@@ -85,7 +89,8 @@ const Index = () => {
       subtitle: 'Измеримые показатели роста',
       content: '• Рост узнаваемости бренда на 200%\n• Увеличение прямых бронирований на 120%\n• Повышение среднего чека на 35%\n• Загрузка объектов круглый год 75%+\n• Развитие партнерской сети с 5+ курортами',
       image: 'https://xn--80aaclrg8cdr7gdk.xn--p1ai/wp-content/uploads/2024/08/20.png',
-      layout: 'left'
+      layout: 'left',
+      showLogo: false
     }
   ]);
 
@@ -252,6 +257,19 @@ const Index = () => {
         textContainer.style.justifyContent = 'center';
         textContainer.style.maxWidth = slide.layout === 'center' ? '900px' : 'none';
         
+        if (settings.logo && slide.showLogo) {
+          const logoEl = document.createElement('img');
+          logoEl.src = settings.logo;
+          logoEl.style.height = 'auto';
+          logoEl.style.width = 'auto';
+          logoEl.style.maxHeight = '210px';
+          logoEl.style.maxWidth = '400px';
+          logoEl.style.objectFit = 'contain';
+          logoEl.style.marginBottom = '32px';
+          logoEl.style.alignSelf = 'flex-start';
+          textContainer.appendChild(logoEl);
+        }
+        
         const subtitleEl = document.createElement('div');
         subtitleEl.textContent = slide.subtitle;
         subtitleEl.style.display = 'inline-block';
@@ -283,17 +301,6 @@ const Index = () => {
         contentEl.style.fontFamily = 'Open Sans, sans-serif';
         contentEl.style.fontWeight = '400';
         contentEl.style.maxWidth = '100%';
-        
-        if (settings.logo) {
-          const logoEl = document.createElement('img');
-          logoEl.src = settings.logo;
-          logoEl.style.height = '210px';
-          logoEl.style.width = 'auto';
-          logoEl.style.maxWidth = '100%';
-          logoEl.style.objectFit = 'contain';
-          logoEl.style.marginBottom = '32px';
-          textContainer.appendChild(logoEl);
-        }
         
         textContainer.appendChild(subtitleEl);
         textContainer.appendChild(titleEl);
@@ -431,6 +438,13 @@ const Index = () => {
     };
     setSlides(updatedSlides);
   };
+  
+  const handleToggleSlideShowLogo = (slideIndex: number) => {
+    const updatedSlides = [...slides];
+    updatedSlides[slideIndex].showLogo = !updatedSlides[slideIndex].showLogo;
+    setSlides(updatedSlides);
+    toast.success(updatedSlides[slideIndex].showLogo ? 'Логотип включен' : 'Логотип выключен');
+  };
 
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -470,7 +484,8 @@ const Index = () => {
       content: 'Содержание слайда',
       image: '',
       layout: 'center',
-      background: ''
+      background: '',
+      showLogo: false
     };
     setSlides([...slides, newSlide]);
     setCurrentSlide(slides.length);
@@ -494,7 +509,7 @@ const Index = () => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const compressed = await compressBackgroundImage(file);
+        const compressed = await compressBackgroundImage(file, true);
         handleUpdateSettings({ logo: compressed });
         toast.success('Логотип загружен');
       } catch (error) {
@@ -505,7 +520,7 @@ const Index = () => {
     if (e.target) e.target.value = '';
   };
   
-  const compressBackgroundImage = (file: File): Promise<string> => {
+  const compressBackgroundImage = (file: File, preserveTransparency = false): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Failed to read file'));
@@ -533,10 +548,13 @@ const Index = () => {
           }
           
           ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          
+          const format = preserveTransparency ? 'image/png' : 'image/jpeg';
+          const quality = preserveTransparency ? 0.92 : 0.85;
+          const compressed = canvas.toDataURL(format, quality);
           
           if (compressed.length > 4 * 1024 * 1024) {
-            const evenMoreCompressed = canvas.toDataURL('image/jpeg', 0.6);
+            const evenMoreCompressed = canvas.toDataURL(format, preserveTransparency ? 0.75 : 0.6);
             if (evenMoreCompressed.length > 4 * 1024 * 1024) {
               reject(new Error('Image too large even after compression'));
               return;
@@ -697,21 +715,41 @@ const Index = () => {
                     >
                       <div className="text-xs font-semibold mb-1 flex items-center justify-between">
                         <span>Слайд {index + 1}</span>
-                        {slide.background && (
-                          <Icon name="Image" size={12} className="opacity-60" />
-                        )}
+                        <div className="flex items-center gap-1">
+                          {slide.background && (
+                            <Icon name="Image" size={12} className="opacity-60" />
+                          )}
+                          {settings.logo && slide.showLogo && (
+                            <Icon name="FileImage" size={12} className="opacity-60" />
+                          )}
+                        </div>
                       </div>
                       <div className="text-sm line-clamp-1">{slide.title}</div>
                     </button>
-                    {isEditing && slides.length > 1 && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                        onClick={() => handleDeleteSlide(index)}
-                      >
-                        <Icon name="X" size={12} />
-                      </Button>
+                    {isEditing && (
+                      <>
+                        {settings.logo && (
+                          <Button
+                            size="sm"
+                            variant={slide.showLogo ? "default" : "secondary"}
+                            className="absolute -top-2 -left-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            onClick={() => handleToggleSlideShowLogo(index)}
+                            title={slide.showLogo ? "Скрыть логотип" : "Показать логотип"}
+                          >
+                            <Icon name="FileImage" size={12} />
+                          </Button>
+                        )}
+                        {slides.length > 1 && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            onClick={() => handleDeleteSlide(index)}
+                          >
+                            <Icon name="X" size={12} />
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 ))}
@@ -818,7 +856,7 @@ const Index = () => {
                         image={slides[currentSlide].image}
                         layout={slides[currentSlide].layout}
                         fullSize={false}
-                        logo={settings.logo}
+                        logo={slides[currentSlide].showLogo ? settings.logo : ''}
                       />
                     </div>
                   </Card>
@@ -834,7 +872,7 @@ const Index = () => {
                   image={slides[currentSlide].image}
                   layout={slides[currentSlide].layout}
                   fullSize={true}
-                  logo={settings.logo}
+                  logo={slides[currentSlide].showLogo ? settings.logo : ''}
                 />
               </Card>
             )}
