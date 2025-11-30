@@ -210,21 +210,62 @@ const Index = () => {
           continue;
         }
         
-        const parentContainer = slideElement.parentElement?.parentElement;
-        if (!parentContainer) {
-          console.error(`Parent container not found for slide ${i}`);
+        const contentContainer = document.querySelector('.lg\\:col-span-9');
+        if (!contentContainer) {
+          console.error(`Content container not found for slide ${i}`);
           continue;
         }
         
-        const canvas = await html2canvas(parentContainer, {
+        const navButtons = contentContainer.querySelector('.flex.justify-between.items-center.mt-4');
+        if (navButtons) {
+          (navButtons as HTMLElement).style.display = 'none';
+        }
+        
+        const slideBackground = slides[i]?.background || backgroundImage;
+        const tempBackgroundDiv = document.createElement('div');
+        if (slideBackground) {
+          tempBackgroundDiv.style.position = 'fixed';
+          tempBackgroundDiv.style.inset = '0';
+          tempBackgroundDiv.style.backgroundImage = `url(${slideBackground})`;
+          tempBackgroundDiv.style.backgroundSize = 'cover';
+          tempBackgroundDiv.style.backgroundPosition = 'center';
+          tempBackgroundDiv.style.zIndex = '-1';
+          document.body.appendChild(tempBackgroundDiv);
+          
+          const overlayDiv = document.createElement('div');
+          overlayDiv.style.position = 'fixed';
+          overlayDiv.style.inset = '0';
+          overlayDiv.style.backgroundColor = document.documentElement.classList.contains('dark') 
+            ? 'rgba(18, 18, 18, 0.6)' 
+            : 'rgba(255, 255, 255, 0.4)';
+          overlayDiv.style.zIndex = '-1';
+          document.body.appendChild(overlayDiv);
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        const canvas = await html2canvas(contentContainer as HTMLElement, {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: null,
+          backgroundColor: slideBackground ? null : '#ffffff',
           logging: false,
-          windowWidth: parentContainer.scrollWidth,
-          windowHeight: parentContainer.scrollHeight
+          windowWidth: (contentContainer as HTMLElement).scrollWidth,
+          windowHeight: (contentContainer as HTMLElement).scrollHeight
         });
+        
+        if (navButtons) {
+          (navButtons as HTMLElement).style.display = '';
+        }
+        
+        if (slideBackground) {
+          const tempDivs = document.querySelectorAll('body > div[style*="position: fixed"]');
+          tempDivs.forEach(div => {
+            if (div.parentElement === document.body && div !== document.querySelector('.container')?.parentElement) {
+              div.remove();
+            }
+          });
+        }
         
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const imgWidth = 297;
