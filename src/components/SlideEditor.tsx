@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
@@ -40,6 +40,33 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [targetBlockId, setTargetBlockId] = useState<string | null>(null);
+  const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!focusedBlockId) return;
+      
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+      
+      if (ctrlKey && e.shiftKey && e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveBlock(focusedBlockId, 'up');
+      } else if (ctrlKey && e.shiftKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        moveBlock(focusedBlockId, 'down');
+      } else if (ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        duplicateBlock(focusedBlockId);
+      } else if (ctrlKey && e.key === 'Backspace') {
+        e.preventDefault();
+        deleteBlock(focusedBlockId);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [focusedBlockId, blocks]);
 
   const updateBlock = (id: string, content: string) => {
     const updatedBlocks = blocks.map(block =>
@@ -155,7 +182,21 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   const renderBlock = (block: Block, index: number) => {
     return (
-      <div key={block.id} className="group relative border border-border rounded-lg p-4 mb-4 hover:border-primary transition-colors">
+      <div 
+        key={block.id} 
+        className={`group relative border rounded-lg p-4 mb-4 transition-colors ${
+          focusedBlockId === block.id 
+            ? 'border-primary ring-2 ring-primary/20' 
+            : 'border-border hover:border-primary'
+        }`}
+        onFocus={() => setFocusedBlockId(block.id)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setFocusedBlockId(null);
+          }
+        }}
+        tabIndex={0}
+      >
         <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
           <Button
             size="sm"
@@ -315,6 +356,16 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
 
   return (
     <div className="space-y-4">
+      <div className="mb-6 p-4 border border-border rounded-lg bg-muted/30">
+        <label className="text-sm font-medium mb-3 block">Горячие клавиши</label>
+        <div className="text-xs text-muted-foreground space-y-1 mb-4">
+          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Shift + ↑</kbd> — Переместить вверх</div>
+          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Shift + ↓</kbd> — Переместить вниз</div>
+          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + D</kbd> — Копировать блок</div>
+          <div><kbd className="px-2 py-0.5 bg-background border rounded">Ctrl/⌘ + Backspace</kbd> — Удалить блок</div>
+        </div>
+      </div>
+      
       <div className="mb-6 p-4 border border-border rounded-lg">
         <label className="text-sm font-medium mb-3 block">Шаблон раскладки</label>
         <div className="grid grid-cols-4 gap-2">
