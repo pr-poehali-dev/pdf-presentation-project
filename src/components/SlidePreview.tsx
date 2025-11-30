@@ -81,22 +81,26 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
       case 'left':
         return (
           <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
-            <div className="flex-1 w-full flex flex-col justify-center">
+            <div className={`${image ? 'flex-1' : 'flex-[2]'} w-full flex flex-col justify-center`}>
               {contentBlock}
             </div>
-            <div className="flex-1 w-full">
-              {imageBlock}
-            </div>
+            {image && (
+              <div className="flex-1 w-full">
+                {imageBlock}
+              </div>
+            )}
           </div>
         );
 
       case 'right':
         return (
           <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
-            <div className="flex-1 w-full">
-              {imageBlock}
-            </div>
-            <div className="flex-1 w-full flex flex-col justify-center">
+            {image && (
+              <div className="flex-1 w-full">
+                {imageBlock}
+              </div>
+            )}
+            <div className={`${image ? 'flex-1' : 'flex-[2]'} w-full flex flex-col justify-center`}>
               {contentBlock}
             </div>
           </div>
@@ -104,8 +108,8 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
-            {imageBlock}
+          <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6 justify-center`}>
+            {image && imageBlock}
             {contentBlock}
           </div>
         );
