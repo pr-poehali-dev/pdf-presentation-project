@@ -265,20 +265,35 @@ const Index = () => {
         
 
         const textContainer = document.createElement('div');
-        textContainer.style.flex = slide.layout === 'left' || slide.layout === 'right' ? '1.2' : '1';
+        textContainer.style.flex = slide.layout === 'left' || slide.layout === 'right' ? '1.3' : '1';
         textContainer.style.display = 'flex';
         textContainer.style.flexDirection = 'column';
         textContainer.style.justifyContent = 'center';
-        textContainer.style.maxWidth = slide.layout === 'center' ? '900px' : 'none';
+        textContainer.style.maxWidth = slide.layout === 'center' ? '1200px' : 'none';
+        textContainer.style.paddingRight = slide.layout === 'left' ? '40px' : '0';
+        textContainer.style.paddingLeft = slide.layout === 'right' ? '40px' : '0';
         
         const contentEl = document.createElement('div');
         contentEl.innerHTML = slide.content;
-        contentEl.style.fontSize = '28px';
-        contentEl.style.lineHeight = '1.7';
+        contentEl.style.fontSize = '38px';
+        contentEl.style.lineHeight = '1.6';
         contentEl.style.color = '#333333';
         contentEl.style.fontFamily = 'Open Sans, sans-serif';
         contentEl.style.fontWeight = '400';
         contentEl.style.maxWidth = '100%';
+        
+        const titles = contentEl.querySelectorAll('.slide-title');
+        titles.forEach((title: Element) => {
+          (title as HTMLElement).style.fontSize = '72px';
+          (title as HTMLElement).style.marginBottom = '40px';
+        });
+        
+        const subtitles = contentEl.querySelectorAll('.slide-subtitle');
+        subtitles.forEach((subtitle: Element) => {
+          (subtitle as HTMLElement).style.fontSize = '32px';
+          (subtitle as HTMLElement).style.padding = '16px 32px';
+          (subtitle as HTMLElement).style.marginBottom = '40px';
+        });
         
         textContainer.appendChild(contentEl);
         
@@ -301,7 +316,11 @@ const Index = () => {
           contentDiv.appendChild(textContainer);
           if (slide.image) {
             const imageContainer = document.createElement('div');
-            imageContainer.style.flex = '0.8';
+            imageContainer.style.flex = '1';
+            imageContainer.style.minWidth = '900px';
+            imageContainer.style.height = '900px';
+            imageContainer.style.overflow = 'hidden';
+            imageContainer.style.borderRadius = '16px';
             imageContainer.style.display = 'flex';
             imageContainer.style.alignItems = 'center';
             imageContainer.style.justifyContent = 'center';
@@ -309,16 +328,20 @@ const Index = () => {
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
             imageEl.style.width = '100%';
-            imageEl.style.maxHeight = '700px';
-            imageEl.style.objectFit = 'contain';
-            imageEl.style.borderRadius = '16px';
+            imageEl.style.height = '100%';
+            imageEl.style.objectFit = 'cover';
+            imageEl.style.objectPosition = 'center';
             imageContainer.appendChild(imageEl);
             contentDiv.appendChild(imageContainer);
           }
         } else if (slide.layout === 'right') {
           if (slide.image) {
             const imageContainer = document.createElement('div');
-            imageContainer.style.flex = '0.8';
+            imageContainer.style.flex = '1';
+            imageContainer.style.minWidth = '900px';
+            imageContainer.style.height = '900px';
+            imageContainer.style.overflow = 'hidden';
+            imageContainer.style.borderRadius = '16px';
             imageContainer.style.display = 'flex';
             imageContainer.style.alignItems = 'center';
             imageContainer.style.justifyContent = 'center';
@@ -326,9 +349,9 @@ const Index = () => {
             const imageEl = document.createElement('img');
             imageEl.src = slide.image;
             imageEl.style.width = '100%';
-            imageEl.style.maxHeight = '700px';
-            imageEl.style.objectFit = 'contain';
-            imageEl.style.borderRadius = '16px';
+            imageEl.style.height = '100%';
+            imageEl.style.objectFit = 'cover';
+            imageEl.style.objectPosition = 'center';
             imageContainer.appendChild(imageEl);
             contentDiv.appendChild(imageContainer);
           }
