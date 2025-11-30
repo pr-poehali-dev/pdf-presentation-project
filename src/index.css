@@ -123,4 +123,38 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
   }
+
+  .ql-toolbar {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    border-color: hsl(var(--border)) !important;
+    background: hsl(var(--background)) !important;
+  }
+
+  .ql-container {
+    border-radius: 0 0 0.75rem 0.75rem !important;
+    border-color: hsl(var(--border)) !important;
+    background: hsl(var(--background)) !important;
+  }
+
+  .ql-editor {
+    color: hsl(var(--foreground)) !important;
+    min-height: 150px;
+  }
+
+  .dark .ql-stroke {
+    stroke: hsl(var(--foreground)) !important;
+  }
+
+  .dark .ql-fill {
+    fill: hsl(var(--foreground)) !important;
+  }
+
+  .dark .ql-picker-label {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .ql-picker-options {
+    background: hsl(var(--card)) !important;
+    border-color: hsl(var(--border)) !important;
+  }
 }

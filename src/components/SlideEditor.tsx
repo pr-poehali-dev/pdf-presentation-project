@@ -339,6 +339,7 @@ const SlideEditor = ({ title, subtitle, content, image, layout, onUpdate }: Slid
                 toolbar: [
                   ['bold', 'italic', 'underline'],
                   [{ list: 'ordered' }, { list: 'bullet' }],
+                  [{ color: [] }, { background: [] }],
                   ['clean']
                 ]
               }}
