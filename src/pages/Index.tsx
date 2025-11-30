@@ -45,6 +45,9 @@ const Index = () => {
     adminPassword: 'admin1234'
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportMode, setExportMode] = useState<'full' | 'selective'>('full');
+  const [selectedSlides, setSelectedSlides] = useState<number[]>([]);
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
@@ -148,7 +151,7 @@ const Index = () => {
     toast.success('Настройки сохранены');
   };
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = async (slideIndices?: number[]) => {
     const loadingToast = toast.loading('Генерация PDF...');
     const html2canvas = (await import('html2canvas')).default;
     
@@ -164,8 +167,11 @@ const Index = () => {
       
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      for (let i = 0; i < slides.length; i++) {
-        if (i > 0) pdf.addPage();
+      const slidesToExport = slideIndices || slides.map((_, idx) => idx);
+      
+      for (let idx = 0; idx < slidesToExport.length; idx++) {
+        const i = slidesToExport[idx];
+        if (idx > 0) pdf.addPage();
         
         const tempSlide = currentSlide;
         setCurrentSlide(i);
@@ -230,6 +236,8 @@ const Index = () => {
       
       pdf.save('presentation-usadba-erzi.pdf');
       toast.success('PDF успешно экспортирован!', { id: loadingToast });
+      setShowExportDialog(false);
+      setSelectedSlides([]);
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Ошибка при экспорте PDF', { id: loadingToast });
@@ -268,6 +276,32 @@ const Index = () => {
     const intensity = settings.mainTitleShadowIntensity;
     return `0 ${intensity}px ${intensity * 2}px rgba(0, 0, 0, 0.1)`;
   };
+  
+  const handleExportClick = () => {
+    setShowExportDialog(true);
+    setSelectedSlides(slides.map((_, idx) => idx));
+  };
+  
+  const handleFullExport = () => {
+    setShowExportDialog(false);
+    handleExportPDF();
+  };
+  
+  const handleSelectiveExport = () => {
+    if (selectedSlides.length === 0) {
+      toast.error('Выберите хотя бы один слайд');
+      return;
+    }
+    handleExportPDF(selectedSlides);
+  };
+  
+  const toggleSlideSelection = (index: number) => {
+    if (selectedSlides.includes(index)) {
+      setSelectedSlides(selectedSlides.filter(i => i !== index));
+    } else {
+      setSelectedSlides([...selectedSlides, index].sort((a, b) => a - b));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -284,15 +318,6 @@ const Index = () => {
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 relative z-10">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
-            {!isAuthenticated && (
-              <Button
-                variant="outline"
-                onClick={() => setShowLoginDialog(true)}
-                className="text-sm rounded-xl"
-              >
-                Разработчику
-              </Button>
-            )}
             <div>
               <div className="flex items-center gap-3">
                 <h1 
@@ -335,7 +360,7 @@ const Index = () => {
                 </Button>
               </>
             )}
-            <Button onClick={handleExportPDF} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
+            <Button onClick={handleExportClick} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
               <Icon name="Download" size={16} className="sm:w-[18px] sm:h-[18px]" />
               <span className="hidden sm:inline">Экспорт PDF</span>
               <span className="sm:hidden">PDF</span>
@@ -514,6 +539,111 @@ const Index = () => {
       `}</style>
       
       <ThemeToggle />
+      
+      {!isAuthenticated && (
+        <Button
+          variant="outline"
+          onClick={() => setShowLoginDialog(true)}
+          className="fixed bottom-6 left-6 z-40 text-sm rounded-xl shadow-xl backdrop-blur-md bg-background/80 border-2"
+        >
+          Разработчику
+        </Button>
+      )}
+      
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">Экспорт презентации</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            {exportMode === 'full' ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={handleFullExport}
+                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-primary bg-primary/10 shadow-lg"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <Icon name="FileDown" size={32} />
+                      <div className="text-lg font-bold">Полный</div>
+                      <div className="text-sm text-muted-foreground">Экспорт всей презентации</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setExportMode('selective')}
+                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-border bg-card hover:border-primary/50 hover:shadow-md"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <Icon name="ListChecks" size={32} />
+                      <div className="text-lg font-bold">Выборочный</div>
+                      <div className="text-sm text-muted-foreground">Выберите страницы для экспорта</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Выберите слайды для экспорта</h3>
+                  <Button variant="ghost" onClick={() => setExportMode('full')} size="sm">
+                    <Icon name="ArrowLeft" size={16} className="mr-2" />
+                    Назад
+                  </Button>
+                </div>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                  {slides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      onClick={() => toggleSlideSelection(index)}
+                      className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
+                        selectedSlides.includes(index)
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-card hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex-shrink-0">
+                        <div
+                          className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                            selectedSlides.includes(index)
+                              ? 'border-primary bg-primary'
+                              : 'border-muted-foreground/30'
+                          }`}
+                        >
+                          {selectedSlides.includes(index) && (
+                            <Icon name="Check" size={16} className="text-primary-foreground" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold mb-1">Слайд {index + 1}</div>
+                        <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      if (selectedSlides.length === slides.length) {
+                        setSelectedSlides([]);
+                      } else {
+                        setSelectedSlides(slides.map((_, idx) => idx));
+                      }
+                    }}
+                    className="flex-1"
+                  >
+                    {selectedSlides.length === slides.length ? 'Снять все' : 'Выбрать все'}
+                  </Button>
+                  <Button onClick={handleSelectiveExport} className="flex-1">
+                    Экспортировать ({selectedSlides.length})
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
