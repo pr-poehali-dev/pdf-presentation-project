@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Slide {
   id: number;
@@ -48,28 +50,75 @@ const Index = () => {
     }
   ]);
 
-  const handleExportDOCX = () => {
-    const docContent = slides.map((slide, index) => 
-      `
-СЛАЙД ${index + 1}
-${slide.title}
-${slide.subtitle}
-
-${slide.content}
-
-${'='.repeat(80)}
-`
-    ).join('\n');
-
-    const blob = new Blob([docContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'presentation-usadba-erzi.docx';
-    link.click();
-    URL.revokeObjectURL(url);
+  const handleExportPDF = async () => {
+    toast.loading('Генерация PDF...');
     
-    toast.success('Презентация экспортирована в DOCX');
+    try {
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      for (let i = 0; i < slides.length; i++) {
+        const slide = slides[i];
+        
+        if (i > 0) {
+          pdf.addPage();
+        }
+
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, 297, 210, 'F');
+
+        if (slide.image && slide.image.startsWith('http')) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = slide.image;
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0);
+              const imgData = canvas.toDataURL('image/jpeg', 0.8);
+              pdf.addImage(imgData, 'JPEG', 150, 20, 130, 85, '', 'FAST');
+            }
+          } catch (e) {
+            console.log('Failed to load image:', slide.image);
+          }
+        }
+
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(slide.subtitle.toUpperCase(), 20, 25);
+
+        pdf.setFontSize(32);
+        pdf.setTextColor(100, 179, 98);
+        pdf.text(slide.title, 20, 40, { maxWidth: 120 });
+
+        pdf.setFontSize(14);
+        pdf.setTextColor(0, 0, 0);
+        const lines = pdf.splitTextToSize(slide.content, 120);
+        pdf.text(lines, 20, 60);
+
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text('усадьбаэрьзи.рф', 20, 200);
+        pdf.text(`${i + 1} / ${slides.length}`, 270, 200);
+      }
+
+      pdf.save('presentation-usadba-erzi.pdf');
+      toast.success('PDF успешно экспортирован!');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Ошибка при экспорте PDF');
+    }
   };
 
   const handleUpdateSlide = (field: keyof Slide, value: string) => {
@@ -114,9 +163,9 @@ ${'='.repeat(80)}
               <Icon name={isEditing ? 'Check' : 'Pencil'} size={18} />
               {isEditing ? 'Готово' : 'Редактировать'}
             </Button>
-            <Button onClick={handleExportDOCX} className="flex items-center gap-2">
+            <Button onClick={handleExportPDF} className="flex items-center gap-2">
               <Icon name="Download" size={18} />
-              Экспорт DOCX
+              Экспорт PDF
             </Button>
           </div>
         </header>
@@ -148,64 +197,75 @@ ${'='.repeat(80)}
 
           <div className="lg:col-span-9">
             <Card className="overflow-hidden shadow-2xl">
-              <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted p-12 flex flex-col justify-center">
-                {isEditing ? (
-                  <div className="space-y-6">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Заголовок</label>
-                      <Input
-                        value={slides[currentSlide].title}
-                        onChange={(e) => handleUpdateSlide('title', e.target.value)}
-                        className="text-2xl font-bold h-auto py-3"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Подзаголовок</label>
-                      <Input
-                        value={slides[currentSlide].subtitle}
-                        onChange={(e) => handleUpdateSlide('subtitle', e.target.value)}
-                        className="h-auto py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Содержание</label>
-                      <Textarea
-                        value={slides[currentSlide].content}
-                        onChange={(e) => handleUpdateSlide('content', e.target.value)}
-                        rows={8}
-                        className="resize-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Изображение</label>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="cursor-pointer"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="max-w-4xl animate-fade-in">
-                    <div className="inline-block px-4 py-1.5 bg-secondary/20 rounded-full text-sm font-medium text-secondary mb-6">
-                      {slides[currentSlide].subtitle}
-                    </div>
-                    <h2 
-                      className="text-5xl font-bold text-primary mb-8 leading-tight"
-                      style={{ fontFamily: 'Montserrat, sans-serif' }}
-                    >
-                      {slides[currentSlide].title}
-                    </h2>
-                    <div 
-                      className="text-xl text-foreground/80 leading-relaxed whitespace-pre-line"
-                      style={{ fontFamily: 'Open Sans, sans-serif' }}
-                    >
-                      {slides[currentSlide].content}
-                    </div>
+              <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative">
+                {!isEditing && slides[currentSlide].image && (
+                  <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
+                    <img 
+                      src={slides[currentSlide].image} 
+                      alt={slides[currentSlide].title}
+                      className="w-full h-full object-cover opacity-30"
+                    />
                   </div>
                 )}
+                <div className="relative z-10 p-12 flex flex-col justify-center h-full">
+                  {isEditing ? (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Заголовок</label>
+                        <Input
+                          value={slides[currentSlide].title}
+                          onChange={(e) => handleUpdateSlide('title', e.target.value)}
+                          className="text-2xl font-bold h-auto py-3"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Подзаголовок</label>
+                        <Input
+                          value={slides[currentSlide].subtitle}
+                          onChange={(e) => handleUpdateSlide('subtitle', e.target.value)}
+                          className="h-auto py-2"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Содержание</label>
+                        <Textarea
+                          value={slides[currentSlide].content}
+                          onChange={(e) => handleUpdateSlide('content', e.target.value)}
+                          rows={8}
+                          className="resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Изображение</label>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="max-w-2xl animate-fade-in">
+                      <div className="inline-block px-4 py-1.5 bg-secondary/20 rounded-full text-sm font-medium text-secondary mb-6">
+                        {slides[currentSlide].subtitle}
+                      </div>
+                      <h2 
+                        className="text-5xl font-bold text-primary mb-8 leading-tight"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        {slides[currentSlide].title}
+                      </h2>
+                      <div 
+                        className="text-xl text-foreground/80 leading-relaxed whitespace-pre-line"
+                        style={{ fontFamily: 'Open Sans, sans-serif' }}
+                      >
+                        {slides[currentSlide].content}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
 
