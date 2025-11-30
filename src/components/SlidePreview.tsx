@@ -108,18 +108,18 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className="flex flex-col">
+          <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-6 md:p-8 lg:p-10' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
             {image && (
-              <div className="w-full rounded-t-2xl overflow-hidden flex-shrink-0">
+              <div className="w-full h-56 sm:h-64 md:h-80 rounded-2xl overflow-hidden flex-shrink-0">
                 <img 
                   src={image} 
                   alt={title}
-                  className="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => setIsImageOpen(true)}
                 />
               </div>
             )}
-            <div className={`${fullSize ? 'p-4 sm:p-6 md:p-8 lg:p-10' : 'p-4 sm:p-6 md:p-8'} flex-shrink-0`}>
+            <div className="flex-shrink-0">
               {contentBlock}
             </div>
           </div>
@@ -132,7 +132,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
   return (
     <>
-      <div className={`${fullSize ? 'aspect-[16/9]' : 'min-h-[300px]'} bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden`}>
+      <div className={`${fullSize ? 'min-h-0' : 'min-h-[300px]'} bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden`}>
         {renderContent()}
       </div>
       
