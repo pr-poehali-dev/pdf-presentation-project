@@ -696,7 +696,7 @@ const Index = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3">
-            <Card className={`p-3 sm:p-4 shadow-lg ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+            <Card className="p-3 sm:p-4 shadow-lg bg-background/60 backdrop-blur-xl border-background/20">
               <div className="flex items-center gap-2 mb-4">
                 {isEditing ? (
                   <Input
@@ -841,7 +841,7 @@ const Index = () => {
           <div className="lg:col-span-9">
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <Card className={`shadow-lg overflow-hidden ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                <Card className="shadow-lg overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
                   <div className="relative">
                     <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
                     <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
@@ -863,7 +863,7 @@ const Index = () => {
                 </Card>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className={`shadow-xl overflow-hidden ${currentSlideBackground ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                  <Card className="shadow-xl overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
                     <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
                       <SlidePreview
                         key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
