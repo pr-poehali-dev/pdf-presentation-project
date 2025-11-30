@@ -8,13 +8,24 @@ interface SlidePreviewProps {
   image: string;
   layout: 'center' | 'left' | 'right' | 'full';
   fullSize?: boolean;
+  logo?: string;
 }
 
-const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = false }: SlidePreviewProps) => {
+const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = false, logo }: SlidePreviewProps) => {
   const [isImageOpen, setIsImageOpen] = useState(false);
   const renderContent = () => {
     const contentBlock = (
       <div className={`${fullSize ? 'max-w-2xl' : 'max-w-md'} animate-fade-in px-4 sm:px-0`}>
+        {logo && (
+          <div className="mb-4 sm:mb-6 flex justify-start">
+            <img 
+              src={logo} 
+              alt="Logo" 
+              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto object-contain"
+              style={{ maxHeight: '210px' }}
+            />
+          </div>
+        )}
         <div className={`inline-block ${fullSize ? 'px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm mb-4 sm:mb-6' : 'px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs mb-3 sm:mb-4'} bg-secondary/20 rounded-full font-medium text-secondary`}>
           {subtitle}
         </div>

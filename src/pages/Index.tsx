@@ -28,6 +28,7 @@ interface AppSettings {
   mainTitleShadowIntensity: number;
   adminLogin: string;
   adminPassword: string;
+  logo: string;
 }
 
 const Index = () => {
@@ -46,7 +47,8 @@ const Index = () => {
     mainTitleShadow: true,
     mainTitleShadowIntensity: 2,
     adminLogin: 'Admin',
-    adminPassword: 'admin1234'
+    adminPassword: 'admin1234',
+    logo: ''
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -282,6 +284,17 @@ const Index = () => {
         contentEl.style.fontWeight = '400';
         contentEl.style.maxWidth = '100%';
         
+        if (settings.logo) {
+          const logoEl = document.createElement('img');
+          logoEl.src = settings.logo;
+          logoEl.style.height = '210px';
+          logoEl.style.width = 'auto';
+          logoEl.style.maxWidth = '100%';
+          logoEl.style.objectFit = 'contain';
+          logoEl.style.marginBottom = '32px';
+          textContainer.appendChild(logoEl);
+        }
+        
         textContainer.appendChild(subtitleEl);
         textContainer.appendChild(titleEl);
         textContainer.appendChild(contentEl);
@@ -447,6 +460,49 @@ const Index = () => {
   
   const handleBackgroundClick = () => {
     setShowBackgroundDialog(true);
+  };
+  
+  const handleAddSlide = () => {
+    const newSlide: Slide = {
+      id: Date.now(),
+      title: 'Новый слайд',
+      subtitle: 'Подзаголовок',
+      content: 'Содержание слайда',
+      image: '',
+      layout: 'center',
+      background: ''
+    };
+    setSlides([...slides, newSlide]);
+    setCurrentSlide(slides.length);
+    toast.success('Слайд добавлен');
+  };
+  
+  const handleDeleteSlide = (index: number) => {
+    if (slides.length <= 1) {
+      toast.error('Нельзя удалить последний слайд');
+      return;
+    }
+    const updatedSlides = slides.filter((_, i) => i !== index);
+    setSlides(updatedSlides);
+    if (currentSlide >= updatedSlides.length) {
+      setCurrentSlide(updatedSlides.length - 1);
+    }
+    toast.success('Слайд удалён');
+  };
+  
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const compressed = await compressBackgroundImage(file);
+        handleUpdateSettings({ logo: compressed });
+        toast.success('Логотип загружен');
+      } catch (error) {
+        console.error('Logo upload error:', error);
+        toast.error('Ошибка при загрузке логотипа');
+      }
+    }
+    if (e.target) e.target.value = '';
   };
   
   const compressBackgroundImage = (file: File): Promise<string> => {
@@ -630,25 +686,46 @@ const Index = () => {
               </h3>
               <div className="space-y-3 mb-6">
                 {slides.map((slide, index) => (
-                  <button
-                    key={slide.id}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`w-full text-left p-3 rounded-xl transition-all relative ${
-                      currentSlide === index
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-[1.02]'
-                        : 'bg-muted hover:bg-muted/80 hover:scale-[1.01]'
-                    }`}
-                  >
-                    <div className="text-xs font-semibold mb-1 flex items-center justify-between">
-                      <span>Слайд {index + 1}</span>
-                      {slide.background && (
-                        <Icon name="Image" size={12} className="opacity-60" />
-                      )}
-                    </div>
-                    <div className="text-sm line-clamp-1">{slide.title}</div>
-                  </button>
+                  <div key={slide.id} className="relative group">
+                    <button
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-full text-left p-3 rounded-xl transition-all ${
+                        currentSlide === index
+                          ? 'bg-primary text-primary-foreground shadow-lg scale-[1.02]'
+                          : 'bg-muted hover:bg-muted/80 hover:scale-[1.01]'
+                      }`}
+                    >
+                      <div className="text-xs font-semibold mb-1 flex items-center justify-between">
+                        <span>Слайд {index + 1}</span>
+                        {slide.background && (
+                          <Icon name="Image" size={12} className="opacity-60" />
+                        )}
+                      </div>
+                      <div className="text-sm line-clamp-1">{slide.title}</div>
+                    </button>
+                    {isEditing && slides.length > 1 && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        onClick={() => handleDeleteSlide(index)}
+                      >
+                        <Icon name="X" size={12} />
+                      </Button>
+                    )}
+                  </div>
                 ))}
               </div>
+              {isEditing && (
+                <Button
+                  onClick={handleAddSlide}
+                  className="w-full mb-4 rounded-xl"
+                  variant="outline"
+                >
+                  <Icon name="Plus" size={16} className="mr-2" />
+                  Добавить слайд
+                </Button>
+              )}
               {isEditing && (
                 <div className="pt-4 border-t border-border/50">
                   <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
@@ -741,6 +818,7 @@ const Index = () => {
                         image={slides[currentSlide].image}
                         layout={slides[currentSlide].layout}
                         fullSize={false}
+                        logo={settings.logo}
                       />
                     </div>
                   </Card>
@@ -756,6 +834,7 @@ const Index = () => {
                   image={slides[currentSlide].image}
                   layout={slides[currentSlide].layout}
                   fullSize={true}
+                  logo={settings.logo}
                 />
               </Card>
             )}
@@ -970,6 +1049,42 @@ const Index = () => {
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div>
+              <label className="text-sm font-medium mb-2 block">Логотип</label>
+              <div className="flex items-center gap-4">
+                {settings.logo ? (
+                  <div className="relative">
+                    <img 
+                      src={settings.logo} 
+                      alt="Logo" 
+                      className="h-24 w-auto object-contain border-2 border-border rounded-xl p-2"
+                    />
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full shadow-lg"
+                      onClick={() => handleUpdateSettings({ logo: '' })}
+                    >
+                      <Icon name="X" size={12} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="h-24 w-32 border-2 border-dashed border-muted-foreground/30 rounded-xl flex items-center justify-center text-muted-foreground">
+                    <Icon name="ImagePlus" size={32} className="opacity-30" />
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('logo-upload')?.click()}
+                  className="rounded-xl"
+                >
+                  <Icon name="Upload" size={16} className="mr-2" />
+                  {settings.logo ? 'Изменить' : 'Загрузить'}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">Рекомендуемая высота: не более 210px</p>
+            </div>
+            
+            <div>
               <label className="text-sm font-medium mb-2 block">Заголовок презентации</label>
               <Input
                 type="text"
@@ -1120,6 +1235,13 @@ const Index = () => {
         accept="image/*"
         className="hidden"
         onChange={handleBackgroundUpload}
+      />
+      <input
+        id="logo-upload"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleLogoUpload}
       />
     </div>
   );
