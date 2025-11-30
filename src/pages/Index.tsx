@@ -531,15 +531,17 @@ const Index = () => {
                 </Card>
                 <div className="hidden lg:block">
                   <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className={`overflow-hidden shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
-                    <SlidePreview
-                      title={slides[currentSlide].title}
-                      subtitle={slides[currentSlide].subtitle}
-                      content={slides[currentSlide].content}
-                      image={slides[currentSlide].image}
-                      layout={slides[currentSlide].layout}
-                      fullSize={false}
-                    />
+                  <Card className={`shadow-xl ${backgroundImage ? 'bg-background/60 backdrop-blur-xl border-background/20' : ''}`}>
+                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar">
+                      <SlidePreview
+                        title={slides[currentSlide].title}
+                        subtitle={slides[currentSlide].subtitle}
+                        content={slides[currentSlide].content}
+                        image={slides[currentSlide].image}
+                        layout={slides[currentSlide].layout}
+                        fullSize={false}
+                      />
+                    </div>
                   </Card>
                 </div>
               </div>

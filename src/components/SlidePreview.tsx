@@ -33,7 +33,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     );
 
     const imageBlock = (
-      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : 'flex-1 min-h-[150px] sm:min-h-[200px]'} overflow-hidden rounded-lg ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center' : ''}`}>
+      <div className={`${layout === 'full' ? 'w-full h-48 sm:h-56 md:h-64' : fullSize ? 'flex-1 min-h-[250px]' : 'flex-1 min-h-[150px]'} overflow-hidden rounded-lg ${!image ? 'border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center' : ''}`}>
         {image ? (
           <img 
             src={image} 
@@ -55,7 +55,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
     switch (layout) {
       case 'center':
         return (
-          <div className="relative h-full">
+          <div className={`relative ${fullSize ? 'h-full' : 'min-h-[400px]'}`}>
             <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden opacity-15">
               {image ? (
                 <img 
@@ -80,19 +80,23 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'left':
         return (
-          <div className={`flex flex-col md:flex-row items-center gap-4 sm:gap-6 h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'}`}>
-            <div className="flex-1 w-full">
+          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
+            <div className="flex-1 w-full flex flex-col justify-center">
               {contentBlock}
             </div>
-            {imageBlock}
+            <div className="flex-1 w-full">
+              {imageBlock}
+            </div>
           </div>
         );
 
       case 'right':
         return (
-          <div className={`flex flex-col md:flex-row items-center gap-4 sm:gap-6 h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'}`}>
-            {imageBlock}
+          <div className={`flex flex-col md:flex-row items-stretch gap-4 sm:gap-6 ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'}`}>
             <div className="flex-1 w-full">
+              {imageBlock}
+            </div>
+            <div className="flex-1 w-full flex flex-col justify-center">
               {contentBlock}
             </div>
           </div>
@@ -100,7 +104,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
       case 'full':
         return (
-          <div className={`flex flex-col h-full ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
+          <div className={`flex flex-col ${fullSize ? 'p-4 sm:p-8 md:p-10 lg:p-12 min-h-full' : 'p-4 sm:p-6 md:p-8'} gap-4 sm:gap-6`}>
             {imageBlock}
             {contentBlock}
           </div>
@@ -113,7 +117,7 @@ const SlidePreview = ({ title, subtitle, content, image, layout, fullSize = fals
 
   return (
     <>
-      <div className="aspect-[16/9] bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden">
+      <div className={`${fullSize ? 'aspect-[16/9]' : 'min-h-[300px]'} bg-gradient-to-br from-background to-muted relative rounded-2xl overflow-hidden`}>
         {renderContent()}
       </div>
       
