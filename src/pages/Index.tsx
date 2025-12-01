@@ -476,126 +476,7 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
-          <div className="lg:col-span-9 order-1 lg:order-1">
-            {isEditing ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <Card className="shadow-lg overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
-                  <div className="relative">
-                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
-                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
-                    <div className="p-4">
-                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
-                    </div>
-                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 pr-2 custom-scrollbar-inset">
-                      <SlideEditor
-                        key={currentSlide}
-                        title={slides[currentSlide].title}
-                        subtitle={slides[currentSlide].subtitle}
-                        content={slides[currentSlide].content}
-                        image={slides[currentSlide].image}
-                        layout={slides[currentSlide].layout}
-                        onUpdate={handleUpdateSlide}
-                      />
-                    </div>
-                  </div>
-                </Card>
-                <div className="hidden lg:block">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className="shadow-xl overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
-                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
-                      <SlidePreview
-                        key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
-                        title={slides[currentSlide].title}
-                        subtitle={slides[currentSlide].subtitle}
-                        content={slides[currentSlide].content}
-                        image={slides[currentSlide].image}
-                        layout={slides[currentSlide].layout}
-                        fullSize={false}
-                        logo={slides[currentSlide].showLogo ? settings.logo : ''}
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <Card className="overflow-hidden shadow-xl bg-background/60 backdrop-blur-xl border-background/20 relative" id={`slide-preview-${currentSlide}`}>
-                  <SlidePreview
-                    key={`preview-${currentSlide}-${slides[currentSlide].id}`}
-                    title={slides[currentSlide].title}
-                    subtitle={slides[currentSlide].subtitle}
-                    content={slides[currentSlide].content}
-                    image={slides[currentSlide].image}
-                    layout={slides[currentSlide].layout}
-                    fullSize={true}
-                    logo={slides[currentSlide].showLogo ? settings.logo : ''}
-                  />
-                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-20">
-                    {settings.whatsappLink && (
-                      <a 
-                        href={settings.whatsappLink} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#22c55e] text-white font-medium transition-all hover:scale-105 shadow-lg"
-                      >
-                        <Icon name="MessageCircle" size={18} />
-                        <span className="hidden sm:inline">WhatsApp</span>
-                      </a>
-                    )}
-                    {settings.telegramLink && (
-                      <a 
-                        href={settings.telegramLink} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white font-medium transition-all hover:scale-105 shadow-lg"
-                      >
-                        <Icon name="Send" size={18} />
-                        <span className="hidden sm:inline">Telegram</span>
-                      </a>
-                    )}
-                  </div>
-                </Card>
-
-                <div className="flex justify-between items-center mt-4 sm:mt-6 gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSlideChange(Math.max(0, currentSlide - 1))}
-                    disabled={currentSlide === 0}
-                    className="flex items-center gap-2"
-                  >
-                    <Icon name="ChevronLeft" size={18} />
-                    Назад
-                  </Button>
-
-                  <div className="flex gap-2">
-                    {slides.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSlideChange(index)}
-                        className={`w-2.5 h-2.5 rounded-full transition-all border-2 ${
-                          currentSlide === index 
-                            ? 'bg-primary border-primary w-8' 
-                            : 'bg-background border-primary/40'
-                        }`}
-                      />
-                    ))}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSlideChange(Math.min(slides.length - 1, currentSlide + 1))}
-                    disabled={currentSlide === slides.length - 1}
-                    className="flex items-center gap-2"
-                  >
-                    Вперёд
-                    <Icon name="ChevronRight" size={18} />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-3 order-2 lg:order-2">
+          <div className="lg:col-span-3 order-2 lg:order-1">
             <Card className="p-3 sm:p-4 shadow-lg bg-background/60 backdrop-blur-xl border-background/20">
               <div className="flex items-center gap-2 mb-4">
                 {isEditing ? (
@@ -735,6 +616,125 @@ const Index = () => {
                 </div>
               )}
             </Card>
+          </div>
+
+          <div className="lg:col-span-9 order-1 lg:order-2">
+            {isEditing ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <Card className="shadow-lg overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
+                  <div className="relative">
+                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
+                    <div className="p-4">
+                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
+                    </div>
+                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 pr-2 custom-scrollbar-inset">
+                      <SlideEditor
+                        key={currentSlide}
+                        title={slides[currentSlide].title}
+                        subtitle={slides[currentSlide].subtitle}
+                        content={slides[currentSlide].content}
+                        image={slides[currentSlide].image}
+                        layout={slides[currentSlide].layout}
+                        onUpdate={handleUpdateSlide}
+                      />
+                    </div>
+                  </div>
+                </Card>
+                <div className="hidden lg:block">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
+                  <Card className="shadow-xl overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
+                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
+                      <SlidePreview
+                        key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
+                        title={slides[currentSlide].title}
+                        subtitle={slides[currentSlide].subtitle}
+                        content={slides[currentSlide].content}
+                        image={slides[currentSlide].image}
+                        layout={slides[currentSlide].layout}
+                        fullSize={false}
+                        logo={slides[currentSlide].showLogo ? settings.logo : ''}
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <Card className="overflow-hidden shadow-xl bg-background/60 backdrop-blur-xl border-background/20 relative" id={`slide-preview-${currentSlide}`}>
+                  <SlidePreview
+                    key={`preview-${currentSlide}-${slides[currentSlide].id}`}
+                    title={slides[currentSlide].title}
+                    subtitle={slides[currentSlide].subtitle}
+                    content={slides[currentSlide].content}
+                    image={slides[currentSlide].image}
+                    layout={slides[currentSlide].layout}
+                    fullSize={true}
+                    logo={slides[currentSlide].showLogo ? settings.logo : ''}
+                  />
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-20">
+                    {settings.whatsappLink && (
+                      <a 
+                        href={settings.whatsappLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#22c55e] text-white font-medium transition-all hover:scale-105 shadow-lg"
+                      >
+                        <Icon name="MessageCircle" size={18} />
+                        <span className="hidden sm:inline">WhatsApp</span>
+                      </a>
+                    )}
+                    {settings.telegramLink && (
+                      <a 
+                        href={settings.telegramLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white font-medium transition-all hover:scale-105 shadow-lg"
+                      >
+                        <Icon name="Send" size={18} />
+                        <span className="hidden sm:inline">Telegram</span>
+                      </a>
+                    )}
+                  </div>
+                </Card>
+
+                <div className="flex justify-between items-center mt-4 sm:mt-6 gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSlideChange(Math.max(0, currentSlide - 1))}
+                    disabled={currentSlide === 0}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon name="ChevronLeft" size={18} />
+                    Назад
+                  </Button>
+
+                  <div className="flex gap-2">
+                    {slides.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSlideChange(index)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all border-2 ${
+                          currentSlide === index 
+                            ? 'bg-primary border-primary w-8' 
+                            : 'bg-background border-primary/40'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSlideChange(Math.min(slides.length - 1, currentSlide + 1))}
+                    disabled={currentSlide === slides.length - 1}
+                    className="flex items-center gap-2"
+                  >
+                    Вперёд
+                    <Icon name="ChevronRight" size={18} />
+                  </Button>
+                </div>
+              </div>
+            )
           </div>
         </div>
       </div>
