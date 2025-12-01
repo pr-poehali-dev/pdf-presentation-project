@@ -506,9 +506,13 @@ const Index = () => {
                         {isEditing ? (
                           <Input
                             value={slide.name || `Слайд ${index + 1}`}
-                            onChange={(e) => handleUpdateSlideName(index, e.target.value)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleUpdateSlideName(index, e.target.value);
+                            }}
                             className="h-5 px-1 text-xs font-semibold py-0 min-w-0 text-foreground bg-background"
                             onClick={(e) => e.stopPropagation()}
+                            onFocus={(e) => e.stopPropagation()}
                           />
                         ) : (
                           <span>{slide.name || `Слайд ${index + 1}`}</span>
