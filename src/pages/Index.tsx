@@ -31,6 +31,9 @@ interface AppSettings {
   adminPassword: string;
   logo: string;
   slidesBlockTitle: string;
+  phoneNumber: string;
+  whatsappLink: string;
+  telegramLink: string;
 }
 
 const Index = () => {
@@ -51,12 +54,12 @@ const Index = () => {
     adminLogin: 'Admin',
     adminPassword: 'admin1234',
     logo: '',
-    slidesBlockTitle: 'Слайды'
+    slidesBlockTitle: 'Слайды',
+    phoneNumber: '+79990000000',
+    whatsappLink: '',
+    telegramLink: ''
   });
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [exportMode, setExportMode] = useState<'full' | 'selective'>('full');
-  const [selectedSlides, setSelectedSlides] = useState<number[]>([]);
   const [slides, setSlides] = useState<Slide[]>([
     {
       id: 1,
@@ -174,88 +177,13 @@ const Index = () => {
     toast.success('Настройки сохранены');
   };
 
-  const handleExportPPTX = async (slideIndices?: number[]) => {
-    const slidesToExport = slideIndices || slides.map((_, idx) => idx);
-    
-    let textContent = `${settings.mainTitle}\n\n`;
-    textContent += `Количество слайдов: ${slidesToExport.length}\n\n`;
-    textContent += '═'.repeat(50) + '\n\n';
-    
-    slidesToExport.forEach((i) => {
-      const slideData = slides[i];
-      textContent += `СЛАЙД ${i + 1}: ${slideData.name || slideData.title}\n`;
-      textContent += '─'.repeat(50) + '\n';
-      
-      if (slideData.title) {
-        textContent += `Заголовок: ${slideData.title}\n`;
-      }
-      if (slideData.subtitle) {
-        textContent += `Подзаголовок: ${slideData.subtitle}\n`;
-      }
-      if (slideData.content) {
-        const cleanContent = slideData.content
-          .replace(/<[^>]*>/g, '')
-          .replace(/&nbsp;/g, ' ')
-          .trim();
-        if (cleanContent) {
-          textContent += `Контент:\n${cleanContent}\n`;
-        }
-      }
-      if (slideData.image) {
-        textContent += `Изображение: ${slideData.image.substring(0, 50)}...\n`;
-      }
-      if (slideData.background) {
-        textContent += `Фон: ${slideData.background.substring(0, 50)}...\n`;
-      }
-      textContent += '\n';
-    });
-    
-    textContent += '\n═'.repeat(50) + '\n';
-    textContent += 'Инструкция для создания PPTX:\n';
-    textContent += '1. Откройте PowerPoint\n';
-    textContent += '2. Создайте новую презентацию в формате 16:9\n';
-    textContent += '3. Скопируйте текст каждого слайда из этого файла\n';
-    textContent += '4. Добавьте изображения и фоны вручную\n';
-    
-    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'presentation-content.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast.success('Контент презентации сохранён в TXT файл');
-    setShowExportDialog(false);
-    setSelectedSlides([]);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleExportClick = () => {
-    setShowExportDialog(true);
-    setSelectedSlides(slides.map((_, idx) => idx));
-  };
-  
-  const handleFullExport = () => {
-    setShowExportDialog(false);
-    handleExportPPTX();
-  };
-  
-  const handleSelectiveExport = () => {
-    if (selectedSlides.length === 0) {
-      toast.error('Выберите хотя бы один слайд');
-      return;
-    }
-    handleExportPPTX(selectedSlides);
-  };
-  
-  const toggleSlideSelection = (index: number) => {
-    if (selectedSlides.includes(index)) {
-      setSelectedSlides(selectedSlides.filter(i => i !== index));
-    } else {
-      setSelectedSlides([...selectedSlides, index].sort((a, b) => a - b));
-    }
+  const handleSlideChange = (index: number) => {
+    setCurrentSlide(index);
+    scrollToTop();
   };
 
   const handleUpdateSlide = (data: { title: string; subtitle: string; content: string; image: string; layout: 'center' | 'left' | 'right' | 'full' }) => {
@@ -433,8 +361,59 @@ const Index = () => {
           />
         </>
       )}
+
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              {settings.logo && (
+                <img src={settings.logo} alt="Logo" className="h-8 sm:h-12 w-auto object-contain" />
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2 sm:gap-3">
+              {settings.whatsappLink && (
+                <a 
+                  href={settings.whatsappLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-[#25D366] hover:bg-[#22c55e] text-white transition-colors"
+                  title="WhatsApp"
+                >
+                  <Icon name="MessageCircle" size={18} />
+                </a>
+              )}
+              {settings.telegramLink && (
+                <a 
+                  href={settings.telegramLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white transition-colors"
+                  title="Telegram"
+                >
+                  <Icon name="Send" size={18} />
+                </a>
+              )}
+              <a 
+                href={`tel:${settings.phoneNumber}`}
+                className="text-sm sm:text-base font-semibold hover:text-primary transition-colors hidden sm:block"
+              >
+                {settings.phoneNumber}
+              </a>
+              <a 
+                href={`tel:${settings.phoneNumber}`}
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors sm:hidden"
+                title={settings.phoneNumber}
+              >
+                <Icon name="Phone" size={18} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8" style={{ position: 'relative', zIndex: 1 }} key={`content-${currentSlide}`}>
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
             <div>
               <div className="flex items-center gap-3">
@@ -474,15 +453,6 @@ const Index = () => {
                   <span className="hidden sm:inline">{isEditing ? 'Готово' : 'Редактировать'}</span>
                   <span className="sm:hidden">{isEditing ? 'Готово' : 'Редакт.'}</span>
                 </Button>
-              </>
-            )}
-            <Button onClick={handleExportClick} className="flex items-center gap-2 flex-1 sm:flex-none text-sm sm:text-base">
-              <Icon name="Download" size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden sm:inline">Экспорт контента</span>
-              <span className="sm:hidden">TXT</span>
-            </Button>
-            {isAuthenticated && (
-              <>
                 <Button
                   variant="outline"
                   onClick={handleBackgroundClick}
@@ -503,10 +473,129 @@ const Index = () => {
               </>
             )}
           </div>
-        </header>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-9 order-1 lg:order-1">
+            {isEditing ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <Card className="shadow-lg overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
+                  <div className="relative">
+                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
+                    <div className="p-4">
+                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
+                    </div>
+                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 pr-2 custom-scrollbar-inset">
+                      <SlideEditor
+                        key={currentSlide}
+                        title={slides[currentSlide].title}
+                        subtitle={slides[currentSlide].subtitle}
+                        content={slides[currentSlide].content}
+                        image={slides[currentSlide].image}
+                        layout={slides[currentSlide].layout}
+                        onUpdate={handleUpdateSlide}
+                      />
+                    </div>
+                  </div>
+                </Card>
+                <div className="hidden lg:block">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
+                  <Card className="shadow-xl overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
+                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
+                      <SlidePreview
+                        key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
+                        title={slides[currentSlide].title}
+                        subtitle={slides[currentSlide].subtitle}
+                        content={slides[currentSlide].content}
+                        image={slides[currentSlide].image}
+                        layout={slides[currentSlide].layout}
+                        fullSize={false}
+                        logo={slides[currentSlide].showLogo ? settings.logo : ''}
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <Card className="overflow-hidden shadow-xl bg-background/60 backdrop-blur-xl border-background/20 relative" id={`slide-preview-${currentSlide}`}>
+                  <SlidePreview
+                    key={`preview-${currentSlide}-${slides[currentSlide].id}`}
+                    title={slides[currentSlide].title}
+                    subtitle={slides[currentSlide].subtitle}
+                    content={slides[currentSlide].content}
+                    image={slides[currentSlide].image}
+                    layout={slides[currentSlide].layout}
+                    fullSize={true}
+                    logo={slides[currentSlide].showLogo ? settings.logo : ''}
+                  />
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-20">
+                    {settings.whatsappLink && (
+                      <a 
+                        href={settings.whatsappLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#22c55e] text-white font-medium transition-all hover:scale-105 shadow-lg"
+                      >
+                        <Icon name="MessageCircle" size={18} />
+                        <span className="hidden sm:inline">WhatsApp</span>
+                      </a>
+                    )}
+                    {settings.telegramLink && (
+                      <a 
+                        href={settings.telegramLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white font-medium transition-all hover:scale-105 shadow-lg"
+                      >
+                        <Icon name="Send" size={18} />
+                        <span className="hidden sm:inline">Telegram</span>
+                      </a>
+                    )}
+                  </div>
+                </Card>
+
+                <div className="flex justify-between items-center mt-4 sm:mt-6 gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSlideChange(Math.max(0, currentSlide - 1))}
+                    disabled={currentSlide === 0}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon name="ChevronLeft" size={18} />
+                    Назад
+                  </Button>
+
+                  <div className="flex gap-2">
+                    {slides.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSlideChange(index)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all border-2 ${
+                          currentSlide === index 
+                            ? 'bg-primary border-primary w-8' 
+                            : 'bg-background border-primary/40'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSlideChange(Math.min(slides.length - 1, currentSlide + 1))}
+                    disabled={currentSlide === slides.length - 1}
+                    className="flex items-center gap-2"
+                  >
+                    Вперёд
+                    <Icon name="ChevronRight" size={18} />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-3 order-2 lg:order-2">
             <Card className="p-3 sm:p-4 shadow-lg bg-background/60 backdrop-blur-xl border-background/20">
               <div className="flex items-center gap-2 mb-4">
                 {isEditing ? (
@@ -525,7 +614,7 @@ const Index = () => {
                 {slides.map((slide, index) => (
                   <div key={slide.id} className="relative group">
                     <button
-                      onClick={() => setCurrentSlide(index)}
+                      onClick={() => handleSlideChange(index)}
                       className={`w-full text-left p-3 rounded-xl transition-all ${
                         currentSlide === index
                           ? 'bg-primary text-primary-foreground shadow-lg scale-[1.02]'
@@ -602,7 +691,6 @@ const Index = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        const lastBlockId = slides[currentSlide].id.toString();
                         document.dispatchEvent(new CustomEvent('addBlock', { detail: { type: 'title' } }));
                       }}
                       className="w-full justify-start text-xs rounded-xl hover:bg-primary/10 hover:border-primary"
@@ -648,99 +736,6 @@ const Index = () => {
               )}
             </Card>
           </div>
-
-          <div className="lg:col-span-9">
-            {isEditing ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <Card className="shadow-lg overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
-                  <div className="relative">
-                    <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-card to-transparent pointer-events-none z-10"></div>
-                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none z-10"></div>
-                    <div className="p-4">
-                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Редактор</h3>
-                    </div>
-                    <div className="max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] overflow-y-auto px-4 pb-4 pr-2 custom-scrollbar-inset">
-                      <SlideEditor
-                        key={currentSlide}
-                        title={slides[currentSlide].title}
-                        subtitle={slides[currentSlide].subtitle}
-                        content={slides[currentSlide].content}
-                        image={slides[currentSlide].image}
-                        layout={slides[currentSlide].layout}
-                        onUpdate={handleUpdateSlide}
-                      />
-                    </div>
-                  </div>
-                </Card>
-                <div className="hidden lg:block">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Превью</h3>
-                  <Card className="shadow-xl overflow-hidden bg-background/60 backdrop-blur-xl border-background/20">
-                    <div className="overflow-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] custom-scrollbar-inset">
-                      <SlidePreview
-                        key={`preview-editor-${currentSlide}-${slides[currentSlide].id}`}
-                        title={slides[currentSlide].title}
-                        subtitle={slides[currentSlide].subtitle}
-                        content={slides[currentSlide].content}
-                        image={slides[currentSlide].image}
-                        layout={slides[currentSlide].layout}
-                        fullSize={false}
-                        logo={slides[currentSlide].showLogo ? settings.logo : ''}
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            ) : (
-              <Card className="overflow-hidden shadow-xl bg-background/60 backdrop-blur-xl border-background/20" id={`slide-preview-${currentSlide}`}>
-                <SlidePreview
-                  key={`preview-${currentSlide}-${slides[currentSlide].id}`}
-                  title={slides[currentSlide].title}
-                  subtitle={slides[currentSlide].subtitle}
-                  content={slides[currentSlide].content}
-                  image={slides[currentSlide].image}
-                  layout={slides[currentSlide].layout}
-                  fullSize={true}
-                  logo={slides[currentSlide].showLogo ? settings.logo : ''}
-                />
-              </Card>
-            )}
-
-            <div className="flex justify-between items-center mt-4 sm:mt-6 gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
-                disabled={currentSlide === 0}
-                className="flex items-center gap-2"
-              >
-                <Icon name="ChevronLeft" size={18} />
-                Назад
-              </Button>
-
-              <div className="flex gap-2">
-                {slides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all border-2 ${
-                      currentSlide === index 
-                        ? 'bg-primary border-primary w-8' 
-                        : 'bg-background border-primary/40'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
-                disabled={currentSlide === slides.length - 1}
-                className="flex items-center gap-2"
-              >
-                Вперёд
-                <Icon name="ChevronRight" size={18} />
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
       
@@ -755,104 +750,6 @@ const Index = () => {
           Разработчику
         </Button>
       )}
-      
-      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-        <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold">Экспорт контента презентации</DialogTitle>
-            <DialogDescription className="text-center">
-              Выберите слайды для экспорта в текстовый файл
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 pt-4">
-            {exportMode === 'full' ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <button
-                    onClick={handleFullExport}
-                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-primary bg-primary/10 shadow-lg"
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <Icon name="FileDown" size={32} />
-                      <div className="text-lg font-bold">Полный</div>
-                      <div className="text-sm text-muted-foreground">Экспорт всей презентации</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setExportMode('selective')}
-                    className="p-6 border-2 rounded-2xl transition-all hover:scale-105 border-border bg-card hover:border-primary/50 hover:shadow-md"
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <Icon name="ListChecks" size={32} />
-                      <div className="text-lg font-bold">Выборочный</div>
-                      <div className="text-sm text-muted-foreground">Выберите страницы для экспорта</div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Выберите слайды для экспорта</h3>
-                  <Button variant="ghost" onClick={() => setExportMode('full')} size="sm">
-                    <Icon name="ArrowLeft" size={16} className="mr-2" />
-                    Назад
-                  </Button>
-                </div>
-                <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                  {slides.map((slide, index) => (
-                    <div
-                      key={slide.id}
-                      onClick={() => toggleSlideSelection(index)}
-                      className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
-                        selectedSlides.includes(index)
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border bg-card hover:border-primary/50'
-                      }`}
-                    >
-                      <div className="flex-shrink-0">
-                        <div
-                          className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
-                            selectedSlides.includes(index)
-                              ? 'border-primary bg-primary'
-                              : 'border-muted-foreground/30'
-                          }`}
-                        >
-                          {selectedSlides.includes(index) && (
-                            <Icon name="Check" size={16} className="text-primary-foreground" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-semibold mb-1">{slide.name || `Слайд ${index + 1}`}</div>
-                        <div className="text-sm text-muted-foreground line-clamp-1">{slide.title}</div>
-                      </div>
-                    </div>
-                  ))}  
-                </div>
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (selectedSlides.length === slides.length) {
-                        setSelectedSlides([]);
-                      } else {
-                        setSelectedSlides(slides.map((_, idx) => idx));
-                      }
-                    }}
-                    className="flex-1"
-                  >
-                    {selectedSlides.length === slides.length ? 'Снять все' : 'Выбрать все'}
-                  </Button>
-                  <Button onClick={handleSelectiveExport} className="flex-1">
-                    Экспортировать ({selectedSlides.length})
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
       
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
@@ -896,11 +793,11 @@ const Index = () => {
       </Dialog>
       
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent className="sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Настройки презентации</DialogTitle>
             <DialogDescription>
-              Настройте логотип, заголовок и параметры доступа к презентации
+              Настройте логотип, заголовок, контакты и параметры доступа
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 pt-4">
@@ -1002,6 +899,44 @@ const Index = () => {
                     <span className="text-sm font-medium w-6">{settings.mainTitleShadowIntensity}</span>
                   </div>
                 )}
+              </div>
+            </div>
+            
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">Контакты</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Номер телефона</label>
+                  <Input
+                    type="tel"
+                    value={settings.phoneNumber}
+                    onChange={(e) => handleUpdateSettings({ phoneNumber: e.target.value })}
+                    placeholder="+79990000000"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Ссылка WhatsApp</label>
+                  <Input
+                    type="url"
+                    value={settings.whatsappLink}
+                    onChange={(e) => handleUpdateSettings({ whatsappLink: e.target.value })}
+                    placeholder="https://wa.me/79990000000"
+                    className="rounded-xl"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Формат: https://wa.me/79990000000</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Ссылка Telegram</label>
+                  <Input
+                    type="url"
+                    value={settings.telegramLink}
+                    onChange={(e) => handleUpdateSettings({ telegramLink: e.target.value })}
+                    placeholder="https://t.me/username"
+                    className="rounded-xl"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Формат: https://t.me/username</p>
+                </div>
               </div>
             </div>
             
